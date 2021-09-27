@@ -1,5 +1,5 @@
 atem:
-  host: 192.168.168.123
+  host: 192.168.0.120
   debug: false
 
 mqtt:

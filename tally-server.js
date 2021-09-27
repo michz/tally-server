@@ -76,15 +76,30 @@ myAtem.on('connected', () => {
     logger.info(myAtem.state);
 })
 
+let currentInputs = {
+    "programInput": 6,
+    "previewInput": 2,
+};
+
 myAtem.on('stateChanged', (state, pathToChange) => {
     // @TODO Check if Tally and send MQTT
-    logger.info(state);
+    logger.debug(JSON.stringify(state.video.mixEffects));
     logger.info(pathToChange);
 
-    // Example:
-    const newChannel = 1;
-    mqttClient.publish(mqttTopicTallyPreview, newChannel.toString());
-    mqttClient.publish(mqttTopicTallyProgram, newChannel.toString());
+    state.video.mixEffects.forEach((effect) => {
+        if (effect.previewInput && currentInputs.previewInput !== effect.previewInput) {
+            logger.info(pathToChange);
+
+            currentInputs.previewInput = effect.previewInput;
+            mqttClient.publish(mqttTopicTallyPreview, currentInputs.previewInput.toString());
+        }
+
+        if (effect.programInput && currentInputs.programInput !== effect.programInput) {
+            currentInputs.programInput = effect.programInput;
+            mqttClient.publish(mqttTopicTallyProgram, currentInputs.programInput.toString());
+        }
+
+    });
 })
 
 const mqttClient = mqtt.connect(
