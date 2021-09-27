@@ -8,8 +8,7 @@ mqtt:
     port: 1883
   topics:
     tally:
-      preview: tally/channel/preview
-      program: tally/channel/program
+      state: "tally/{0}/state"
 
   clientOptions:
     # If connection is lost, try reconnecting after X ms

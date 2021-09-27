@@ -7,8 +7,16 @@ const { Atem } = require('atem-connection')
 const file = fs.readFileSync('./config.yml', 'utf8')
 const config = YAML.parse(file)
 
-const mqttTopicTallyPreview = config['mqtt']['topics']['tally']['preview'];
-const mqttTopicTallyProgram = config['mqtt']['topics']['tally']['program'];
+const mqttTopicFormatTallyState = config['mqtt']['topics']['tally']['state'];
+
+String.prototype.format = function() {
+    var formatted = this;
+    for (var i = 0; i < arguments.length; i++) {
+        var regexp = new RegExp('\\{'+i+'\\}', 'gi');
+        formatted = formatted.replace(regexp, arguments[i]);
+    }
+    return formatted;
+};
 
 let customLogFormat = winston.format.combine(
     winston.format.timestamp({
@@ -76,30 +84,51 @@ myAtem.on('connected', () => {
     logger.info(myAtem.state);
 })
 
-let currentInputs = {
-    "programInput": 6,
-    "previewInput": 2,
-};
+let lastTallyChannels = {};
+const codeTallyOff = 'off';
+const codeTallyPreview = 'prv';
+const codeTallyProgram = 'pgm';
 
 myAtem.on('stateChanged', (state, pathToChange) => {
-    // @TODO Check if Tally and send MQTT
     logger.debug(JSON.stringify(state.video.mixEffects));
     logger.info(pathToChange);
 
+    const mixEffectsFilterRegex = new RegExp(".*video\.mixEffects.*", "g");
+    if (!mixEffectsFilterRegex.test(pathToChange)) {
+        return;
+    }
+
+    let currentChannels = {};
+
     state.video.mixEffects.forEach((effect) => {
-        if (effect.previewInput && currentInputs.previewInput !== effect.previewInput) {
-            logger.info(pathToChange);
-
-            currentInputs.previewInput = effect.previewInput;
-            mqttClient.publish(mqttTopicTallyPreview, currentInputs.previewInput.toString());
+        // Program has highest priority, so always set.
+        if (effect.programInput) {
+            currentChannels[effect.programInput] = codeTallyProgram;
         }
 
-        if (effect.programInput && currentInputs.programInput !== effect.programInput) {
-            currentInputs.programInput = effect.programInput;
-            mqttClient.publish(mqttTopicTallyProgram, currentInputs.programInput.toString());
-        }
+        // Set Preview only if it is not yet set to Program
+        if (effect.previewInput && codeTallyProgram !== currentChannels[effect.previewInput]) {
 
+            // During a Transition, both are on Program
+            if (effect.transitionPosition && effect.transitionPosition.inTransition) {
+                currentChannels[effect.previewInput] = codeTallyProgram;
+            } else {
+                currentChannels[effect.previewInput] = codeTallyPreview;
+            }
+        }
     });
+
+    Object.keys(lastTallyChannels).forEach((channel) => {
+        if (!(channel in currentChannels)) {
+            mqttClient.publish(mqttTopicFormatTallyState.format(channel), codeTallyOff);
+        }
+    });
+
+    Object.keys(currentChannels).forEach((channel) => {
+        mqttClient.publish(mqttTopicFormatTallyState.format(channel), currentChannels[channel]);
+    });
+
+    lastTallyChannels = currentChannels;
 })
 
 const mqttClient = mqtt.connect(
