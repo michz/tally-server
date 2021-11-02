@@ -8,9 +8,10 @@
   },
   "homepage": "https://github.com/michz/tally-server",
   "license": "UNLICENSED",
-  "main": "tally-server.js",
-  "bin": "tally-server.js",
+  "main": "src/main.js",
+  "bin": "src/main.js",
   "dependencies": {
+    "aedes": "^0.46.1",
     "atem-connection": "^2.3.0",
     "mqtt": "^4.2.8",
     "winston": "^3.3.3",

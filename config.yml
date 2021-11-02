@@ -1,10 +1,13 @@
 atem:
-  host: 192.168.0.120
+  host: 192.168.1.69
   debug: false
+
+control:
+  port: 8090
 
 mqtt:
   broker:
-    host: 192.168.0.22
+  #  host: 192.168.1.30
     port: 1883
   topics:
     tally:
