@@ -1,6 +1,7 @@
 'use strict';
 
 const fs = require('fs')
+const os = require('os')
 const YAML = require('yaml')
 
 const AtemClient = require("./AtemClient.js")
@@ -61,7 +62,7 @@ const mqttClient = new MqttClient(
 // ATEM
 const atemClient = new AtemClient(
     logger,
-    config['atem']['host'],
+    config['atem']['host'] || '',
     (channel, state) => {
         mqttClient.publish(
             config['mqtt']['topics']['tally']['state'].format(channel),
@@ -75,7 +76,10 @@ const atemClient = new AtemClient(
             },
         })
     },
-    config['atem']['debug']
+    config['atem']['debug'],
+    config['atem']['use_mdns'],
+    config['atem']['mdns_name'],
+    mdnsClient
 )
 atemClient.run()
 
@@ -92,5 +96,18 @@ logToCallbackTransport.addCallback((info) => {
 // Run Control Webserver
 controlServer.run()
 
+logger.info("Control UI available at:")
 
 // @TODO list other local IP addresses
+const nets = os.networkInterfaces();
+const results = [];
+
+for (const name of Object.keys(nets)) {
+    for (const net of nets[name]) {
+        if (net.family === 'IPv4') {
+            logger.info("http://" + net.address + ":" + config['control']['httpPort'] + "/")
+        } else if (net.family === 'IPv6') {
+            logger.info("http://[" + net.address + "]:" + config['control']['httpPort'] + "/")
+        }
+    }
+}

@@ -5,9 +5,10 @@ const mdns_service = '_tally_mqtt'
 
 module.exports = class MdnsClient {
     constructor(logger) {
-        const mdns = MulticastDNS({
+        this.mdns = MulticastDNS({
             reuseAddr: true
         })
+        this.queryCallback = null;
 
         //this.mdns.on('response', function(response) {
         //    console.log('got a response packet:', response)
@@ -15,7 +16,7 @@ module.exports = class MdnsClient {
 
         const that = this;
 
-        mdns.on('query', function(query) {
+        this.mdns.on('query', function(query) {
             const hostname = os.hostname()
             const hostnameLocal = hostname + '.local'
             const fullServiceHostname = hostname + '.' + mdns_service + '._tcp.local'
@@ -25,7 +26,7 @@ module.exports = class MdnsClient {
                 if (question['class'] === 'IN' && question['type'] === 'PTR' && question['name'] === mdns_service + '._tcp.local') {
                     logger.info('[mDNS] Answering for Tally MQTT...')
                     logger.info('[mDNS] Query was: ' + JSON.stringify(question))
-                    mdns.respond({
+                    this.mdns.respond({
                         answers: [
                             {
                                 name: mdns_service + '._tcp.local',
@@ -61,6 +62,13 @@ module.exports = class MdnsClient {
             }
         })
 
+
+        this.mdns.on('response', (response) => {
+            if (this.queryCallback) {
+                this.queryCallback(response)
+            }
+        })
+
         //// Example Query:
         //this.mdns.query({
         //    questions:[{
@@ -88,5 +96,14 @@ module.exports = class MdnsClient {
         }
 
         return results[0];
+    }
+
+    query(query, callback) {
+        this.queryCallback = callback
+        this.mdns.query({questions: [query]})
+    }
+
+    deregisterQueryCallback() {
+        this.queryCallback = null;
     }
 }

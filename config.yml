@@ -1,5 +1,8 @@
 atem:
-  host: 192.168.0.120
+  use_mdns: true
+  #use_mdns: false
+  mdns_name: "ATEM Mini Extreme ISO._blackmagic._tcp.local"
+  #host: 192.168.0.120
   #host: 192.168.1.69
   debug: false
 

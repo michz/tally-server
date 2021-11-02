@@ -1,15 +1,18 @@
-const { Atem } = require('atem-connection')
+const { Atem, AtemConnectionStatus } = require('atem-connection')
 
-const codeTallyOff = 'off';
-const codeTallyPreview = 'prv';
-const codeTallyProgram = 'pgm';
+const codeTallyOff = 'off'
+const codeTallyPreview = 'prv'
+const codeTallyProgram = 'pgm'
 
 module.exports = class AtemClient {
-    constructor(logger, atemHost, mqttPublishCallback, debug) {
+    constructor(logger, atemHost, mqttPublishCallback, debug, useMdns, mdnsName, mdnsClient) {
         this.logger = logger
         this.atemHost = atemHost
         this.mqttPublishCallback = mqttPublishCallback
         this.atem = new Atem({ debugBuffers: debug })
+        this.useMdns = useMdns
+        this.atemMdnsName = mdnsName
+        this.mdnsClient = mdnsClient
 
         this.lastTallyChannels = {}
 
@@ -17,7 +20,6 @@ module.exports = class AtemClient {
             'connected',
             () => {
                 this.logger.info("[ATEM] Connected to ATEM Mixer")
-                this.logger.info(this.atem.state)
             }
         )
         this.atem.on(
@@ -83,9 +85,56 @@ module.exports = class AtemClient {
         )
     }
 
-    run() {
+    async run() {
+        /*
+            CLOSED = 0,
+            CONNECTING = 1,
+            CONNECTED = 2
+        */
+
+        // This endless loop will continously check the connection state and try a reconnect.
+        while (true) {
+            if (this.atem.status == AtemConnectionStatus.CLOSED) {
+                if (this.useMdns) {
+                    // Try to discover Atem via mDNS
+                    this.mdnsClient.query(
+                        {
+                            name: "_blackmagic._tcp.local",
+                            type: "PTR",
+                        },
+                        (answer) => {
+                            if ("answers" in answer && answer["answers"].length > 0 && answer["answers"][0]["type"] == "PTR" && answer["answers"][0]["data"] == this.atemMdnsName) {
+                                if ("additionals" in answer == false) {
+                                    return
+                                }
+
+                                for (const additional of answer["additionals"]) {
+                                    if ("data" in additional && "type" in additional && additional["type"] == "A") {
+                                        // Wohoo we found an ATEM!
+                                        this.atemHost = additional["data"]
+                                        this.mdnsClient.deregisterQueryCallback()
+                                        this.logger.info("Found ATEM via mDNS: " + this.atemHost)
+                                        return
+                                    }
+                                }
+                            }
+                        }
+                    )
+                }
+
+                if (this.atemHost != "") {
+                    this.logger.info("Try connecting to ATEM at " + this.atemHost)
+                    this.atem.connect(this.atemHost)
+                } else {
+                    this.logger.warn("No ATEM found yet and none configured!")
+                }
+            };
+
+            // This is a sleed() effectively
+            await new Promise(resolve => setTimeout(resolve, 1000));
+        }
+
         // @TODO Try to fix the bug:
         //       If run, no fatal error messages are posted to console any more.
-        this.atem.connect(this.atemHost)
     }
 }
