@@ -1,9 +1,11 @@
 atem:
-  host: 192.168.1.69
+  host: 192.168.0.120
+  #host: 192.168.1.69
   debug: false
 
 control:
-  port: 8090
+  httpPort: 8090
+  websocketPort: 8091
 
 mqtt:
   broker:

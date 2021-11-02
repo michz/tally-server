@@ -1,4 +1,7 @@
-const aedes = require('aedes')()
+const aedes = require('aedes')({
+    heartbeatInterval: 10000,
+    connectTimeout: 3000,
+})
 
 
 module.exports = class MqttBroker {
@@ -10,7 +13,7 @@ module.exports = class MqttBroker {
 
     run() {
         this.server.listen(this.port, () => {
-            this.logger.info('[MQTT] server started and listening on port ', this.port)
+            this.logger.info('[MQTT] server started and listening on port ' + this.port)
         })
     }
 

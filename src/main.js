@@ -1,13 +1,18 @@
+'use strict';
+
 const fs = require('fs')
 const YAML = require('yaml')
 
 const AtemClient = require("./AtemClient.js")
 const ControlServer = require("./ControlServer.js")
+const MdnsClient = require("./MdnsClient.js")
 const MqttBroker = require("./MqttBroker.js")
 const MqttClient = require("./MqttClient.js")
 const Log = require("./Log.js")
+const LogToCallbackTransport = require('./LogToCallbackTransport.js')
 
-const log = new Log()
+const logToCallbackTransport = new LogToCallbackTransport();
+const log = new Log(logToCallbackTransport)
 const logger = log.getLogger()
 
 // Load configuration
@@ -16,42 +21,76 @@ const config = YAML.parse(file)
 logger.info('Config: ' + JSON.stringify(config, null, 2));
 
 
-// @TODO mDNS
+// mDNS Client/Server
+const mdnsClient = new MdnsClient(logger)
 
 // MQTT Broker
-mqttBroker = new MqttBroker(
+const mqttBroker = new MqttBroker(
     logger,
     parseInt(config['mqtt']['broker']['port'], 10)
 )
 mqttBroker.run()
 
+// Control Web Server
+const controlServer = new ControlServer(
+    logger,
+    parseInt(config['control']['httpPort'], 10),
+    parseInt(config['control']['websocketPort'], 10)
+)
+
 // MQTT client
-mqttClient = new MqttClient(
+const mqttClient = new MqttClient(
     logger,
     config['mqtt']['broker']['port'],
-    config['mqtt']['clientOptions']
+    config['mqtt']['clientOptions'],
+    (topic, payload) => {
+        var re = /tally\/(\d+)\/online/
+        var matches = topic.match(re)
+        if (matches !== null && matches.length > 0) {
+            controlServer.sendToWebsocketClients({
+                type: 'online',
+                data: {
+                    channel: matches[1],
+                    state: (payload === "0") ? "offline" : "online",
+                },
+            })
+        }
+    }
 )
 
 // ATEM
-atemClient = new AtemClient(
+const atemClient = new AtemClient(
     logger,
     config['atem']['host'],
     (channel, state) => {
         mqttClient.publish(
             config['mqtt']['topics']['tally']['state'].format(channel),
             state
-        );
+        )
+        controlServer.sendToWebsocketClients({
+            type: 'channel',
+            data: {
+                channel: channel,
+                state: state,
+            },
+        })
     },
     config['atem']['debug']
 )
 atemClient.run()
 
-// Control Web Server
-controlServer = new ControlServer(
-    logger,
-    parseInt(config['control']['port'], 10)
-)
+
+logToCallbackTransport.addCallback((info) => {
+    controlServer.sendToWebsocketClients({
+        type: "log",
+        data: {
+            msg: info["timestamp"] + " [" + info["level"] + "] " + info["message"],
+        },
+    })
+})
+
+// Run Control Webserver
 controlServer.run()
 
-logger.info(`Webserver running at http://127.0.0.1:${controlServer.getPort()}`)
+
 // @TODO list other local IP addresses

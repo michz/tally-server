@@ -2,8 +2,150 @@
 <html>
     <head>
         <title>Tally Server Control</title>
+        <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+
+        <link rel="stylesheet" href="https://unpkg.com/chota@latest" crossorigin="anonymous">
+
+        <style>
+            body.dark {
+                --bg-color: #000;
+                --bg-secondary-color: #131316;
+                --font-color: #f5f5f5;
+                --color-grey: #ccc;
+                --color-darkGrey: #777;
+
+                margin: 0;
+                padding: 0 2vw;
+
+                font-family: sans-serif;
+                font-size: 12pt;
+            }
+
+            body.dark hr {
+                background-color: #333;
+            }
+
+            .card {
+                margin: 2rem 1vw;
+                padding: 3.5rem 1rem 0 1rem;
+                height: 12rem;
+
+                background-color: rgb(39, 39, 39);
+                color: #777;
+
+                font-size: 3rem;
+                font-weight: bold;
+                text-align: center;
+
+                overflow: hidden;
+                border-bottom: 5px solid rgb(0, 124, 107);
+            }
+
+            .card.main {
+                width: 6vw;
+            }
+
+            .card.mini {
+                padding: 5rem 0.25rem 0 0.25rem;
+                width: 4vw;
+                font-size: 1rem;
+            }
+
+            .card.offline {
+                opacity: 0.4;
+
+                border-bottom: 5px solid rgb(124, 0, 0);
+            }
+
+            .card.pgm {
+                background-color: rgb(224, 0, 0);
+                color: rgb(255, 255, 255);
+            }
+            .card.prv {
+                background-color: rgb(23, 197, 0);
+                color: rgb(255, 255, 255);
+            }
+
+            #log {
+                padding: 1rem;
+                border: 1px solid #333;
+                background-color: #111;
+                color: #ddd;
+                font-size: 1.2rem;
+                font-family: monospace;
+                height: 60vh;
+                overflow-y: scroll;
+            }
+
+        </style>
     </head>
-    <body>
-        TODO
+    <body class="dark">
+        <h1>Tally Overview</h1>
+
+        <div class="row">
+            <div class="card offline main" data-channel="1">1</div>
+            <div class="card offline main" data-channel="2">2</div>
+            <div class="card offline main" data-channel="3">3</div>
+            <div class="card offline main" data-channel="4">4</div>
+            <div class="card offline main" data-channel="5">5</div>
+            <div class="card offline main" data-channel="6">6</div>
+            <div class="card offline main" data-channel="7">7</div>
+            <div class="card offline main" data-channel="8">8</div>
+            <div class="card offline mini" data-channel="3010">MP1</div>
+            <div class="card offline mini" data-channel="3020">MP2</div>
+            <div class="card offline mini" data-channel="6000">S/SRC</div>
+            <div class="card offline mini" data-channel="">BLACK</div>
+        </div>
+
+        <hr>
+
+        <h1>Logs</h1>
+
+        <div id="log">
+        </div>
+
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <script>
+            $(document).ready(() => {
+                var ws = new WebSocket('ws://localhost:8091/');
+                ws.onopen = function() {
+                    console.log('WebSocket Client Connected');
+                    //ws.send('Hi this is web client.');
+                };
+                ws.onmessage = (e) => {
+                    var msg = JSON.parse(e.data)
+                    if (msg.type === "channel") {
+                        var $button = $(".card[data-channel='" + msg.data.channel + "']")
+
+                        if ($button.length == 0) {
+                            return
+                        }
+
+                        $button
+                            .removeClass("pgm")
+                            .removeClass("prv")
+                            .removeClass("off")
+
+                        $button.addClass(msg.data.state)
+                    } else if (msg.type === "online") {
+                        var $button = $(".card[data-channel='" + msg.data.channel + "']")
+
+                        if ($button.length == 0) {
+                            return
+                        }
+
+                        if (msg.data.state === "online") {
+                            $button.removeClass("offline");
+                        } else {
+                            $button.addClass("offline");
+                        }
+                    } else if (msg.type === "log") {
+                        var $log = $("#log");
+                        $log.append(msg.data.msg + "<br>");
+                        $log.scrollTop($log[0].scrollHeight);
+                    }
+                };
+            });
+        </script>
     </body>
-</html>>
+</html>

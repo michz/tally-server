@@ -41,8 +41,8 @@ module.exports = class AtemClient {
         this.atem.on(
             'stateChanged',
             (state, pathToChange) => {
-                state.logger.debug(JSON.stringify(state.video.mixEffects))
-                state.logger.info(pathToChange)
+                this.logger.debug(JSON.stringify(state.video.mixEffects))
+                this.logger.info(pathToChange)
 
                 const mixEffectsFilterRegex = new RegExp(".*video\.mixEffects.*", "g")
                 if (!mixEffectsFilterRegex.test(pathToChange)) {
@@ -84,6 +84,8 @@ module.exports = class AtemClient {
     }
 
     run() {
+        // @TODO Try to fix the bug:
+        //       If run, no fatal error messages are posted to console any more.
         this.atem.connect(this.atemHost)
     }
 }

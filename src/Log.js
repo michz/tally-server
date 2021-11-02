@@ -1,7 +1,7 @@
 const winston = require('winston')
 
 module.exports = class Log {
-    constructor() {
+    constructor(logToCallbackTransport) {
         const customLogFormat = winston.format.combine(
             winston.format.timestamp({
                 format: "YYYY-MM-DD HH:mm:ss",
@@ -25,9 +25,12 @@ module.exports = class Log {
                 new winston.transports.File({ filename: 'tally-server.log' }),
                 new (winston.transports.Console)({
                     format: customLogFormatColorized,
-                })
+                }),
+                logToCallbackTransport
             ],
         });
+
+
     }
 
     log(obj) {
