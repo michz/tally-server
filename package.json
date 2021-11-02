@@ -15,6 +15,7 @@
     "atem-connection": "^2.3.0",
     "mqtt": "^4.2.8",
     "multicast-dns": "^7.2.4",
+    "open": "^8.4.0",
     "websocket": "^1.0.34",
     "winston": "^3.3.3",
     "yaml": "^1.10.2"
