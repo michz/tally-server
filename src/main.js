@@ -112,5 +112,6 @@ for (const name of Object.keys(nets)) {
     }
 }
 
-const open = require('open')
+const open = require('open');
+const { apps } = require('open');
 open('http://127.0.0.1:' + config['control']['httpPort'])

@@ -1,11 +1,13 @@
-const fs = require("fs");
-const http = require("http");
-const net = require('net');
-const path = require("path");
-const url = require("url");
-const websocket = require("websocket");
+const fs = require("fs")
+const http = require("http")
+const net = require('net')
+const path = require("path")
+const url = require("url")
+const websocket = require("websocket")
 
 const webserverBasedir = process.cwd() + '/public';
+
+//path.join(__dirname, '/public/index.html')
 
 module.exports = class ControlServer {
     constructor(logger, httpPort, websocketPort) {
@@ -21,6 +23,26 @@ module.exports = class ControlServer {
             let filename = path.join(webserverBasedir, uri);
             this.logger.info(filename);
 
+            if (uri == '/') {
+                fs.readFile(__dirname + "/public/index.html", "binary", function(err, file) {
+                    response.writeHead(200, {"Content-Type": "text/html"});
+                    response.write(file, "binary");
+                    response.end();
+                })
+            } else if (uri == '/chota.css') {
+                fs.readFile(__dirname + "/public/chota.css", "binary", function(err, file) {
+                    response.writeHead(200, {"Content-Type": "text/css"});
+                    response.write(file, "binary");
+                    response.end();
+                })
+            } else if (uri == '/jquery-3.6.0.min.js') {
+                fs.readFile(__dirname + "/public/jquery-3.6.0.min.js", "binary", function(err, file) {
+                    response.writeHead(200, {"Content-Type": "text/javascript"});
+                    response.write(file, "binary");
+                    response.end();
+                })
+            }
+            /*
             fs.exists(filename, function(exists) {
                 if (!exists) {
                     response.writeHead(404, {"Content-Type": "text/plain"});
@@ -46,6 +68,7 @@ module.exports = class ControlServer {
                     response.end();
                 });
             });
+            */
         }).listen(this.httpPort);
         this.logger.info(`Webserver running at http://127.0.0.1:${this.httpPort}`)
 
