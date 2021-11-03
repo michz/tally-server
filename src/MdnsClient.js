@@ -16,7 +16,7 @@ module.exports = class MdnsClient {
 
         const that = this;
 
-        this.mdns.on('query', function(query) {
+        this.mdns.on('query', (query) => {
             const hostname = os.hostname()
             const hostnameLocal = hostname + '.local'
             const fullServiceHostname = hostname + '.' + mdns_service + '._tcp.local'
