@@ -20,6 +20,9 @@ module.exports = class AtemClient {
             'connected',
             () => {
                 this.logger.info("[ATEM] Connected to ATEM Mixer")
+
+                // Get and send current Tally state
+                this.handleMixEffectsChanges(this.atem.state.video.mixEffects)
             }
         )
         this.atem.on(
@@ -51,38 +54,42 @@ module.exports = class AtemClient {
                     return
                 }
 
-                let currentChannels = {};
-
-                state.video.mixEffects.forEach((effect) => {
-                    // Program has highest priority, so always set.
-                    if (effect.programInput) {
-                        currentChannels[effect.programInput] = codeTallyProgram;
-                    }
-
-                    // Set Preview only if it is not yet set to Program
-                    if (effect.previewInput && codeTallyProgram !== currentChannels[effect.previewInput]) {
-                        // During a Transition, both are on Program
-                        if (effect.transitionPosition && effect.transitionPosition.inTransition) {
-                            currentChannels[effect.previewInput] = codeTallyProgram;
-                        } else {
-                            currentChannels[effect.previewInput] = codeTallyPreview;
-                        }
-                    }
-                });
-
-                Object.keys(this.lastTallyChannels).forEach((channel) => {
-                    if (!(channel in currentChannels)) {
-                        this.mqttPublishCallback(channel, codeTallyOff)
-                    }
-                });
-
-                Object.keys(currentChannels).forEach((channel) => {
-                    this.mqttPublishCallback(channel, currentChannels[channel])
-                });
-
-                this.lastTallyChannels = currentChannels;
+                this.handleMixEffectsChanges(state.video.mixEffects)
             }
         )
+    }
+
+    handleMixEffectsChanges(mixEffects) {
+        let currentChannels = {};
+
+        mixEffects.forEach((effect) => {
+            // Program has highest priority, so always set.
+            if (effect.programInput) {
+                currentChannels[effect.programInput] = codeTallyProgram;
+            }
+
+            // Set Preview only if it is not yet set to Program
+            if (effect.previewInput && codeTallyProgram !== currentChannels[effect.previewInput]) {
+                // During a Transition, both are on Program
+                if (effect.transitionPosition && effect.transitionPosition.inTransition) {
+                    currentChannels[effect.previewInput] = codeTallyProgram;
+                } else {
+                    currentChannels[effect.previewInput] = codeTallyPreview;
+                }
+            }
+        });
+
+        Object.keys(this.lastTallyChannels).forEach((channel) => {
+            if (!(channel in currentChannels)) {
+                this.mqttPublishCallback(channel, codeTallyOff)
+            }
+        });
+
+        Object.keys(currentChannels).forEach((channel) => {
+            this.mqttPublishCallback(channel, currentChannels[channel])
+        });
+
+        this.lastTallyChannels = currentChannels;
     }
 
     async run() {
