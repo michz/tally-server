@@ -13,6 +13,7 @@ module.exports = class ControlServer {
         this.httpPort = httpPort
         this.websocketPort = websocketPort
         this.websocketClients = []
+        this.websocketClientConnectedCallback = null
     }
 
     run() {
@@ -57,6 +58,10 @@ module.exports = class ControlServer {
             const connection = request.accept(null, request.origin)
             this.websocketClients.push(connection)
 
+            if (this.websocketClientConnectedCallback !== null) {
+                this.websocketClientConnectedCallback(connection)
+            }
+
             // @TODO Commands from client?
             //connection.on('message', (message) => {
             //    console.log('Received Message:', message.utf8Data);
@@ -83,5 +88,9 @@ module.exports = class ControlServer {
         for (const client of this.websocketClients) {
             client.sendUTF(JSON.stringify(msg))
         }
+    }
+
+    setWebsocketClientConnectedCallback(callback) {
+        this.websocketClientConnectedCallback = callback
     }
 }

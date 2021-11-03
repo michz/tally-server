@@ -3,6 +3,8 @@ const aedes = require('aedes')({
     connectTimeout: 3000,
 })
 
+const aedes_persistence = require('aedes-persistence')
+
 
 module.exports = class MqttBroker {
     constructor(logger, port) {
@@ -19,5 +21,9 @@ module.exports = class MqttBroker {
 
     getPort() {
         return this.port
+    }
+
+    getBroker() {
+        return aedes
     }
 }

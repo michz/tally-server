@@ -94,12 +94,43 @@ logToCallbackTransport.addCallback((info) => {
     })
 })
 
+// Additional Wiring
+controlServer.setWebsocketClientConnectedCallback((connection) => {
+    for (const message of mqttBroker.getBroker().persistence._retained) {
+        const reOnline = /tally\/(\d+)\/online/
+        let matches = message["topic"].match(reOnline)
+        if (matches !== null && matches.length > 0) {
+            const payload = message.payload.toString('utf-8')
+            controlServer.sendToWebsocketClients({
+                type: 'online',
+                data: {
+                    channel: matches[1],
+                    state: (payload === "0") ? "offline" : "online",
+                },
+            })
+        }
+
+        const reState = /tally\/(\d+)\/state/
+        matches = message["topic"].match(reState)
+        if (matches !== null && matches.length > 0) {
+            const payload = message.payload.toString('utf-8')
+            controlServer.sendToWebsocketClients({
+                type: 'channel',
+                data: {
+                    channel: matches[1],
+                    state: payload,
+                },
+            })
+        }
+    }
+})
+
 // Run Control Webserver
 controlServer.run()
 
 logger.info("Control UI available at:")
 
-// @TODO list other local IP addresses
+// List other local IP addresses on console
 const nets = os.networkInterfaces();
 const results = [];
 
