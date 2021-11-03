@@ -7,7 +7,7 @@
     "url": "https://mztx.de/"
   },
   "homepage": "https://github.com/michz/tally-server",
-  "license": "UNLICENSED",
+  "license": "MIT",
   "main": "src/main.js",
   "bin": "src/main.js",
   "dependencies": {

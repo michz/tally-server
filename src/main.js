@@ -2,148 +2,167 @@
 
 const fs = require('fs')
 const os = require('os')
+const path = require("path")
 const YAML = require('yaml')
 
-const AtemClient = require("./AtemClient.js")
-const ControlServer = require("./ControlServer.js")
-const MdnsClient = require("./MdnsClient.js")
-const MqttBroker = require("./MqttBroker.js")
-const MqttClient = require("./MqttClient.js")
-const Log = require("./Log.js")
-const LogToCallbackTransport = require('./LogToCallbackTransport.js')
-
-const logToCallbackTransport = new LogToCallbackTransport();
-const log = new Log(logToCallbackTransport)
-const logger = log.getLogger()
-
-// Load configuration
-const file = fs.readFileSync('./config.yml', 'utf8')
-const config = YAML.parse(file)
-logger.info('Config: ' + JSON.stringify(config, null, 2));
-
-
-// mDNS Client/Server
-const mdnsClient = new MdnsClient(logger)
-
-// MQTT Broker
-const mqttBroker = new MqttBroker(
-    logger,
-    parseInt(config['mqtt']['broker']['port'], 10)
-)
-mqttBroker.run()
-
-// Control Web Server
-const controlServer = new ControlServer(
-    logger,
-    parseInt(config['control']['httpPort'], 10),
-    parseInt(config['control']['websocketPort'], 10)
-)
-
-// MQTT client
-const mqttClient = new MqttClient(
-    logger,
-    config['mqtt']['broker']['port'],
-    config['mqtt']['clientOptions'],
-    (topic, payload) => {
-        var re = /tally\/(\d+)\/online/
-        var matches = topic.match(re)
-        if (matches !== null && matches.length > 0) {
-            controlServer.sendToWebsocketClients({
-                type: 'online',
-                data: {
-                    channel: matches[1],
-                    state: (payload === "0") ? "offline" : "online",
-                },
-            })
-        }
-    }
-)
-
-// ATEM
-const atemClient = new AtemClient(
-    logger,
-    config['atem']['host'] || '',
-    (channel, state) => {
-        mqttClient.publish(
-            config['mqtt']['topics']['tally']['state'].format(channel),
-            state,
-            true
-        )
-        controlServer.sendToWebsocketClients({
-            type: 'channel',
-            data: {
-                channel: channel,
-                state: state,
-            },
-        })
-    },
-    config['atem']['debug'],
-    config['atem']['use_mdns'],
-    config['atem']['mdns_name'],
-    mdnsClient
-)
-atemClient.run()
-
-
-logToCallbackTransport.addCallback((info) => {
-    controlServer.sendToWebsocketClients({
-        type: "log",
-        data: {
-            msg: info["timestamp"] + " [" + info["level"] + "] " + info["message"],
-        },
-    })
-})
-
-// Additional Wiring
-controlServer.setWebsocketClientConnectedCallback((connection) => {
-    for (const message of mqttBroker.getBroker().persistence._retained) {
-        const reOnline = /tally\/(\d+)\/online/
-        let matches = message["topic"].match(reOnline)
-        if (matches !== null && matches.length > 0) {
-            const payload = message.payload.toString('utf-8')
-            controlServer.sendToWebsocketClients({
-                type: 'online',
-                data: {
-                    channel: matches[1],
-                    state: (payload === "0") ? "offline" : "online",
-                },
-            })
+if (process.argv.includes("-h") || process.argv.includes("--help")) {
+    console.log("No command line parameters available.")
+    console.log("Please provide a config file at current working directory.")
+    process.exit(0)
+} else if (process.argv.includes("-v") || process.argv.includes("--version")) {
+    fs.readFile(path.join(__dirname, "../package.json"), "binary", (err, file) => {
+        if (err) {
+            console.log("Could not read package.json file.")
+            process.exit(1)
         }
 
-        const reState = /tally\/(\d+)\/state/
-        matches = message["topic"].match(reState)
-        if (matches !== null && matches.length > 0) {
-            const payload = message.payload.toString('utf-8')
+        const packageJson = JSON.parse(file)
+        console.log(packageJson["version"])
+        process.exit(0)
+    });
+} else {
+    const AtemClient = require("./AtemClient.js")
+    const ControlServer = require("./ControlServer.js")
+    const MdnsClient = require("./MdnsClient.js")
+    const MqttBroker = require("./MqttBroker.js")
+    const MqttClient = require("./MqttClient.js")
+    const Log = require("./Log.js")
+    const LogToCallbackTransport = require('./LogToCallbackTransport.js')
+
+    const logToCallbackTransport = new LogToCallbackTransport();
+    const log = new Log(logToCallbackTransport)
+    const logger = log.getLogger()
+
+    // Load configuration
+    const file = fs.readFileSync('./config.yml', 'utf8')
+    const config = YAML.parse(file)
+    logger.info('Config: ' + JSON.stringify(config, null, 2));
+
+
+    // mDNS Client/Server
+    const mdnsClient = new MdnsClient(logger)
+
+    // MQTT Broker
+    const mqttBroker = new MqttBroker(
+        logger,
+        parseInt(config['mqtt']['broker']['port'], 10)
+    )
+    mqttBroker.run()
+
+    // Control Web Server
+    const controlServer = new ControlServer(
+        logger,
+        parseInt(config['control']['httpPort'], 10),
+        parseInt(config['control']['websocketPort'], 10)
+    )
+
+    // MQTT client
+    const mqttClient = new MqttClient(
+        logger,
+        config['mqtt']['broker']['port'],
+        config['mqtt']['clientOptions'],
+        (topic, payload) => {
+            var re = /tally\/(\d+)\/online/
+            var matches = topic.match(re)
+            if (matches !== null && matches.length > 0) {
+                controlServer.sendToWebsocketClients({
+                    type: 'online',
+                    data: {
+                        channel: matches[1],
+                        state: (payload === "0") ? "offline" : "online",
+                    },
+                })
+            }
+        }
+    )
+
+    // ATEM
+    const atemClient = new AtemClient(
+        logger,
+        config['atem']['host'] || '',
+        (channel, state) => {
+            mqttClient.publish(
+                config['mqtt']['topics']['tally']['state'].format(channel),
+                state,
+                true
+            )
             controlServer.sendToWebsocketClients({
                 type: 'channel',
                 data: {
-                    channel: matches[1],
-                    state: payload,
+                    channel: channel,
+                    state: state,
                 },
             })
+        },
+        config['atem']['debug'],
+        config['atem']['use_mdns'],
+        config['atem']['mdns_name'],
+        mdnsClient
+    )
+    atemClient.run()
+
+
+    logToCallbackTransport.addCallback((info) => {
+        controlServer.sendToWebsocketClients({
+            type: "log",
+            data: {
+                msg: info["timestamp"] + " [" + info["level"] + "] " + info["message"],
+            },
+        })
+    })
+
+    // Additional Wiring
+    controlServer.setWebsocketClientConnectedCallback((connection) => {
+        for (const message of mqttBroker.getBroker().persistence._retained) {
+            const reOnline = /tally\/(\d+)\/online/
+            let matches = message["topic"].match(reOnline)
+            if (matches !== null && matches.length > 0) {
+                const payload = message.payload.toString('utf-8')
+                controlServer.sendToWebsocketClients({
+                    type: 'online',
+                    data: {
+                        channel: matches[1],
+                        state: (payload === "0") ? "offline" : "online",
+                    },
+                })
+            }
+
+            const reState = /tally\/(\d+)\/state/
+            matches = message["topic"].match(reState)
+            if (matches !== null && matches.length > 0) {
+                const payload = message.payload.toString('utf-8')
+                controlServer.sendToWebsocketClients({
+                    type: 'channel',
+                    data: {
+                        channel: matches[1],
+                        state: payload,
+                    },
+                })
+            }
+        }
+    })
+
+    // Run Control Webserver
+    controlServer.run()
+
+    logger.info("Control UI available at:")
+
+    // List other local IP addresses on console
+    const nets = os.networkInterfaces();
+    const results = [];
+
+    for (const name of Object.keys(nets)) {
+        for (const net of nets[name]) {
+            if (net.family === 'IPv4') {
+                logger.info("http://" + net.address + ":" + config['control']['httpPort'] + "/")
+            } else if (net.family === 'IPv6') {
+                logger.info("http://[" + net.address + "]:" + config['control']['httpPort'] + "/")
+            }
         }
     }
-})
 
-// Run Control Webserver
-controlServer.run()
+    const open = require('open');
+    const { apps } = require('open');
+    open('http://127.0.0.1:' + config['control']['httpPort'])
 
-logger.info("Control UI available at:")
-
-// List other local IP addresses on console
-const nets = os.networkInterfaces();
-const results = [];
-
-for (const name of Object.keys(nets)) {
-    for (const net of nets[name]) {
-        if (net.family === 'IPv4') {
-            logger.info("http://" + net.address + ":" + config['control']['httpPort'] + "/")
-        } else if (net.family === 'IPv6') {
-            logger.info("http://[" + net.address + "]:" + config['control']['httpPort'] + "/")
-        }
-    }
 }
-
-const open = require('open');
-const { apps } = require('open');
-open('http://127.0.0.1:' + config['control']['httpPort'])
