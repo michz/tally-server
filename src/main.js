@@ -66,7 +66,8 @@ const atemClient = new AtemClient(
     (channel, state) => {
         mqttClient.publish(
             config['mqtt']['topics']['tally']['state'].format(channel),
-            state
+            state,
+            true
         )
         controlServer.sendToWebsocketClients({
             type: 'channel',

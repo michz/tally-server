@@ -25,7 +25,7 @@
   },
   "pkg": {
     "scripts": "src/*.js",
-    "assets": "src/public/*",
+    "assets": "public/*",
     "outputPath": "dist"
   }
 }
