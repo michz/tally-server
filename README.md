@@ -10,11 +10,39 @@ video switcher.
 * Emits MQTT messages for each channel/effects change of the video mixer
 * Serves a very simple status webpage
 
+
+## Running executables
+
+For all operating systems:
+
+* Download the binary for your system from the GitHub releases page.
+* Create a config file in the same directory, called `config.yml`.
+  For an example, see `config.yml` in this repository.
+
+### Windows
+
+Simply execute the exe file.
+
+### Linux
+
+* Open terminal, go to (`cd`) the directory where you put the executable.
+* `chmod +x tally-server-linux`
+* Execute via `./tally-server-linux`
+
+### MacOs
+
+* Open terminal, go to (`cd`) the directory where you put the executable.
+* `chmod +x tally-server-macos`
+* Execute via `./tally-server-macos`
+* Confirm all warnings about unverified source/developer
+
+
 ## Node
 
 Node Version: see `.nvmrc`
 
 Type `nvm use` to initialize `nvm` correctly.
+
 
 ## Packing Executables
 
