@@ -8,6 +8,11 @@ const YAML = require('yaml')
 if (process.argv.includes("-h") || process.argv.includes("--help")) {
     console.log("No command line parameters available.")
     console.log("Please provide a config file at current working directory.")
+    console.log("")
+    console.log("Parameters:")
+    console.log("-e\tOutput an example config file")
+    console.log("-h\tOutput this help/usage text")
+    console.log("-v\tOutput version")
     process.exit(0)
 } else if (process.argv.includes("-v") || process.argv.includes("--version")) {
     fs.readFile(path.join(__dirname, "../package.json"), "binary", (err, file) => {
@@ -20,12 +25,23 @@ if (process.argv.includes("-h") || process.argv.includes("--help")) {
         console.log(packageJson["version"])
         process.exit(0)
     });
+} else if (process.argv.includes("-e")) {
+    fs.readFile(path.join(__dirname, "../config.yml"), "binary", (err, file) => {
+        if (err) {
+            console.log("Could not read example config file.")
+            process.exit(1)
+        }
+
+        console.log(file)
+        process.exit(0)
+    });
 } else {
     const AtemClient = require("./AtemClient.js")
     const ControlServer = require("./ControlServer.js")
     const MdnsClient = require("./MdnsClient.js")
     const MqttBroker = require("./MqttBroker.js")
     const MqttClient = require("./MqttClient.js")
+    const X32Client = require("./X32Client.js")
     const Log = require("./Log.js")
     const LogToCallbackTransport = require('./LogToCallbackTransport.js')
 
@@ -49,6 +65,14 @@ if (process.argv.includes("-h") || process.argv.includes("--help")) {
     )
     mqttBroker.run()
 
+    // X32 Client
+    if (!("host" in config['x32']) || !("tally_mapping" in config['x32'])) {
+        console.log("X32 config is missing `host` or `tally_mapping` parameter")
+        process.exit(2)
+    }
+    const x32Client = new X32Client(logger, config['x32']['host'])
+    x32Client.run()
+
     // Control Web Server
     const controlServer = new ControlServer(
         logger,
@@ -62,14 +86,38 @@ if (process.argv.includes("-h") || process.argv.includes("--help")) {
         config['mqtt']['broker']['port'],
         config['mqtt']['clientOptions'],
         (topic, payload) => {
-            var re = /tally\/(\d+)\/online/
-            var matches = topic.match(re)
-            if (matches !== null && matches.length > 0) {
+            const onlineRE = /tally\/(\d+)\/online/
+            const talkbackRE = /tally\/(\d+)\/talkback/
+            const onlineMatches = topic.match(onlineRE)
+            const talkbackMatches = topic.match(talkbackRE)
+            if (onlineMatches !== null && onlineMatches.length > 0) {
                 controlServer.sendToWebsocketClients({
                     type: 'online',
                     data: {
-                        channel: matches[1],
+                        channel: onlineMatches[1],
                         state: (payload === "0") ? "offline" : "online",
+                    },
+                })
+            } else if (talkbackMatches !== null && talkbackMatches.length > 0) {
+                const tally = talkbackMatches[1]
+                const muteState = (payload === "0")
+
+                // First inform X32
+                if (tally in config['x32']['tally_mapping']) {
+                    x32Client.setChannelMute(
+                        config['x32']['tally_mapping'][tally],
+                        muteState
+                    )
+                } else {
+                    logger.error(`Got Talkback command from Tally (${tally}) that is not in config (see x32.tally_mapping)`)
+                }
+
+                // Then inform Websocket clients (Control UI)
+                controlServer.sendToWebsocketClients({
+                    type: 'talkback',
+                    data: {
+                        channel: tally,
+                        state: !muteState,
                     },
                 })
             }

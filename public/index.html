@@ -38,7 +38,10 @@
                 text-align: center;
 
                 overflow: hidden;
-                border-bottom: 5px solid rgb(0, 124, 107);
+                border: 1px solid #484848;
+                border-bottom: 10px solid rgb(0, 124, 107);
+
+                box-shadow: none;
             }
 
             .card.main {
@@ -54,7 +57,10 @@
             .card.offline {
                 opacity: 0.4;
 
-                border-bottom: 5px solid rgb(124, 0, 0);
+                border-bottom: 10px solid rgb(124, 0, 0);
+            }
+            .card.talkbackActive {
+                box-shadow: inset 0px 16px 0px rgb(241, 205, 0);
             }
 
             .card.pgm {
@@ -138,6 +144,18 @@
                             $button.removeClass("offline");
                         } else {
                             $button.addClass("offline");
+                        }
+                    } else if (msg.type === "talkback") {
+                        var $button = $(".card[data-channel='" + msg.data.channel + "']")
+
+                        if ($button.length == 0) {
+                            return
+                        }
+
+                        if (msg.data.state) {
+                            $button.addClass("talkbackActive");
+                        } else {
+                            $button.removeClass("talkbackActive");
                         }
                     } else if (msg.type === "log") {
                         var $log = $("#log");

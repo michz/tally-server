@@ -6,9 +6,12 @@ atem:
   #host: 192.168.1.69
   debug: false
 
+
+# Control web server configuration
 control:
   httpPort: 8090
   websocketPort: 8091
+
 
 mqtt:
   broker:
@@ -23,3 +26,13 @@ mqtt:
     # (0 disables automatic reconnection completely!)
     reconnectPeriod: 500
     connectTimeout: 5000
+
+
+# For receiving (un)mute events for talkback channels from the Tally devices
+x32:
+  host: 192.168.23.202
+
+  # Which tally number (left) triggers which channel's (right) mute state
+  tally_mapping:
+    1: 15
+    2: 16

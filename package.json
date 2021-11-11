@@ -1,6 +1,6 @@
 {
   "name": "tally-server",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "author": {
     "name": "Michael Zapf",
     "email": "m.zapf@mztx.de",
@@ -13,6 +13,7 @@
   "dependencies": {
     "aedes": "^0.46.1",
     "atem-connection": "^2.3.0",
+    "m32": "^0.0.9",
     "mqtt": "^4.2.8",
     "multicast-dns": "^7.2.4",
     "open": "^8.4.0",
