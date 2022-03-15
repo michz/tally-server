@@ -11,18 +11,18 @@
   "main": "src/main.js",
   "bin": "src/main.js",
   "dependencies": {
-    "aedes": "^0.46.1",
-    "atem-connection": "^2.3.0",
+    "aedes": "^0.46.3",
+    "atem-connection": "^2.4.0",
     "m32": "^0.0.9",
-    "mqtt": "^4.2.8",
+    "mqtt": "^4.3.6",
     "multicast-dns": "^7.2.4",
     "open": "^8.4.0",
     "websocket": "^1.0.34",
-    "winston": "^3.3.3",
+    "winston": "^3.6.0",
     "yaml": "^1.10.2"
   },
   "devDependencies": {
-    "pkg": "^5.4.1"
+    "pkg": "^5.5.2"
   },
   "pkg": {
     "scripts": "src/*.js",
