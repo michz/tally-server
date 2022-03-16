@@ -29,7 +29,7 @@ Simply execute the exe file.
 * `chmod +x tally-server-linux`
 * Execute via `./tally-server-linux`
 
-### MacOs
+### MacOS
 
 * Open terminal, go to (`cd`) the directory where you put the executable.
 * `chmod +x tally-server-macos`
