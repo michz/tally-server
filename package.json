@@ -19,7 +19,7 @@
     "open": "^8.4.0",
     "websocket": "^1.0.34",
     "winston": "^3.6.0",
-    "yaml": "^1.10.2"
+    "yaml": "^2.0.1"
   },
   "devDependencies": {
     "pkg": "^5.5.2"
