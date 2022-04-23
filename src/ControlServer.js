@@ -14,11 +14,16 @@ module.exports = class ControlServer {
         this.websocketPort = websocketPort
         this.websocketClients = []
         this.websocketClientConnectedCallback = null
+        this.websocketClientSentMessageCallback = null
     }
 
     run() {
         http.createServer((request, response) => {
             let uri = url.parse(request.url).pathname;
+            if (uri.startsWith('/node_modules/')) {
+                uri = '/..' + uri;
+            }
+
             let filename = path.join(webserverBasedir, uri);
 
             fs.exists(filename, function(exists) {
@@ -72,6 +77,23 @@ module.exports = class ControlServer {
                 const idx = this.websocketClients.indexOf(connection)
                 this.websocketClients.slice(idx, 1)
             })
+
+            connection.on('message', (message) => {
+                if (message.type === 'utf8') {
+                    const data = JSON.parse(message.utf8Data);
+                    if (!data) {
+                        this.logger.error("Received unparsable message from websocket client: \n" + message.utf8Data);
+                        return;
+                    }
+
+                    if (this.websocketClientSentMessageCallback !== null) {
+                        this.websocketClientSentMessageCallback(data)
+                    }
+                }
+                else if (message.type === 'binary') {
+                    this.logger.error("Received binary message from websocket client. I am not able to handle this.");
+                }
+            })
         })
         websocketHttpServer.listen(this.websocketPort)
     }
@@ -92,5 +114,9 @@ module.exports = class ControlServer {
 
     setWebsocketClientConnectedCallback(callback) {
         this.websocketClientConnectedCallback = callback
+    }
+
+    setWebsocketClientSentMessageCallback(callback) {
+        this.websocketClientSentMessageCallback = callback
     }
 }

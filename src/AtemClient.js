@@ -49,7 +49,7 @@ module.exports = class AtemClient {
                 this.logger.debug(JSON.stringify(state.video.mixEffects))
                 this.logger.info(pathToChange)
 
-                const mixEffectsFilterRegex = new RegExp(".*video\.mixEffects.*", "g")
+                const mixEffectsFilterRegex = new RegExp(".*video\.mixEffects.*|.*video\.downstreamKeyers.*", "g")
                 if (!mixEffectsFilterRegex.test(pathToChange)) {
                     return
                 }
