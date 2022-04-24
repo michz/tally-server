@@ -168,9 +168,19 @@
                 min-height: 60vh;
             }
 
+            .ui.button.applicationSettings {
+                float: right;
+            }
+
         </style>
     </head>
-    <body class="dark">
+    <body class="dark dimmable">
+        <div class="ui active dimmer global-loader-dimmer">
+            <div class="ui text loader">Connecting...</div>
+        </div>
+
+        <div class="ui icon button black applicationSettings"><i class="icon cog"></i></div>
+
         <h1>Tally Overview</h1>
 
         <div class="ui stackable grid">
@@ -188,9 +198,7 @@
                 <div class="column"><div class="card offline mini" data-channel="6000"><span class="talkback-channel" title="Change Intercom Channel">-</span><span class="settings" title="Tally Configuration"></span>S/SRC</div></div>
                 <div class="column"><div class="card offline mini" data-channel=""><span class="talkback-channel" title="Change Intercom Channel">-</span><span class="settings" title="Tally Configuration"></span>BLACK</div></div>
             </div>
-            <div class="row">
-                <div class="ui icon button black applicationSettings"><i class="icon cog"></i></div>
-            </div>
+
         </div>
 
         <hr>
@@ -198,6 +206,16 @@
         <h1>Logs</h1>
 
         <div id="log">
+        </div>
+
+        <div class="ui basic modal disconnected">
+            <div class="ui icon header">
+                <i class="exclamation triangle icon"></i>
+                Disconnected
+            </div>
+            <div class="content">
+                <p style="text-align: center">Please reload the page to try to connect again!</p>
+            </div>
         </div>
 
         <div class="ui large modal settingsOverlay">
@@ -290,7 +308,16 @@
                 const ws = new WebSocket('ws://' + window.location.hostname + ':8091/');
                 ws.onopen = function() {
                     console.log('WebSocket Client Connected');
+                    $('.ui.global-loader-dimmer').removeClass('active');
                     //ws.send('Hi this is web client.');
+                };
+                ws.onclose = function() {
+                    $('.ui.modal.disconnected')
+                        .modal({
+                            closable: false,
+                        })
+                        .modal('show')
+                    ;
                 };
                 ws.onmessage = (e) => {
                     var msg = JSON.parse(e.data)
@@ -443,6 +470,10 @@
 
                 $('.ui.checkbox')
                     .checkbox()
+                ;
+
+                $('.ui.nag')
+                    .nag()
                 ;
 
                 $('.ui.nag')
