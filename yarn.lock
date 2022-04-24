@@ -1292,7 +1292,7 @@ pkg-fetch@3.3.0:
     tar-fs "^2.1.1"
     yargs "^16.2.0"
 
-pkg@^5.5.2:
+pkg@^5.6.0:
   version "5.6.0"
   resolved "https://registry.yarnpkg.com/pkg/-/pkg-5.6.0.tgz#53d2616491e429db293d93d474e69ca3dc0f281d"
   integrity sha512-mHrAVSQWmHA41RnUmRpC7pK9lNnMfdA16CF3cqOI22a8LZxOQzF7M8YWtA2nfs+d7I0MTDXOtkDsAsFXeCpYjg==
