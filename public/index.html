@@ -4,31 +4,62 @@
         <title>Tally Server Control</title>
         <meta http-equiv="content-type" content="text/html; charset=UTF-8">
 
-        <link rel="stylesheet" href="chota.css" crossorigin="anonymous">
+        <link rel="stylesheet" href="node_modules/fomantic-ui-css/semantic.min.css" crossorigin="anonymous">
 
         <style>
             body.dark {
-                --bg-color: #000;
-                --bg-secondary-color: #131316;
-                --font-color: #f5f5f5;
-                --color-grey: #ccc;
-                --color-darkGrey: #777;
-
                 margin: 0;
                 padding: 0 2vw;
 
                 font-family: sans-serif;
                 font-size: 12pt;
+
+                background-color: #000;
             }
 
             body.dark hr {
                 background-color: #333;
             }
 
+
+            .dark > h1, .dark :not(.ui.modal) h1,
+            .dark > h2, .dark :not(.ui.modal) h2,
+            .dark > h3, .dark :not(.ui.modal) h3,
+            .dark > h4, .dark :not(.ui.modal) h4,
+            .dark > h5, .dark :not(.ui.modal) h5,
+            .dark > p, .dark :not(.ui.modal) p,
+            .dark > span, .dark :not(.ui.modal) span,
+            .dark > i, .dark :not(.ui.modal) i/*,
+            .dark > div , .dark :not(.ui.modal) div*/ {
+                color: #f5f5f5;
+            }
+
+
+            .dark .ui.modal h1,
+            .dark .ui.modal h2,
+            .dark .ui.modal h3,
+            .dark .ui.modal h4,
+            .dark .ui.modal h5,
+            .dark .ui.modal p,
+            .dark .ui.modal span,
+            .dark .ui.modal i,
+            .dark .ui.modal div {
+                color: unset;
+            }
+
+            /*.dark .ui.modal p {
+                color: #000000;
+            }*/
+
             .card {
+                position: relative;
+                /*
                 margin: 2rem 1vw;
-                padding: 3.5rem 1rem 0 1rem;
-                height: 12rem;
+                padding: 1.5em 1rem 1.5em 1rem;
+                */
+                margin: 2rem auto;
+                padding-top: 1.5em;
+                padding-bottom: 1.5em;
 
                 background-color: rgb(39, 39, 39);
                 color: #777;
@@ -44,14 +75,10 @@
                 box-shadow: none;
             }
 
-            .card.main {
-                width: 6vw;
-            }
-
             .card.mini {
-                padding: 5rem 0.25rem 0 0.25rem;
-                width: 4vw;
+                padding: 1rem 0;
                 font-size: 1rem;
+                max-width: 5rem;
             }
 
             .card.offline {
@@ -83,24 +110,95 @@
                 overflow-y: scroll;
             }
 
+            .card .settings {
+                display: none;
+            }
+            .card.has-settings .settings {
+                display: inline-block;
+            }
+
+            .card .talkback-channel {
+                position: absolute;
+                display: inline-block;
+                top: 0.25em;
+                left: 0.25em;
+                opacity: 0.5;
+                font-size: 0.5em;
+                color: #fff;
+                font-weight: normal;
+                font-family: monospace sans-serif;
+                transition: opacity 0.25s ease-out;
+            }
+
+            .card.mini .talkback-channel {
+                font-size: 1.2em;
+            }
+
+            .card .talkback-channel:hover {
+                cursor: pointer;
+                opacity: 1;
+                transition: opacity 0.25s ease-out;
+            }
+
+            .card .settings {
+                position: absolute;
+                top: 0.25em;
+                right: 0.25em;
+                background-image: url('data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iaXNvLTg4NTktMSI/Pg0KPCEtLSBHZW5lcmF0b3I6IEFkb2JlIElsbHVzdHJhdG9yIDE5LjEuMCwgU1ZHIEV4cG9ydCBQbHVnLUluIC4gU1ZHIFZlcnNpb246IDYuMDAgQnVpbGQgMCkgIC0tPg0KPHN2ZyB2ZXJzaW9uPSIxLjEiIGlkPSJDYXBhXzEiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHg9IjBweCIgeT0iMHB4Ig0KCSB2aWV3Qm94PSIwIDAgNDgyLjU2OCA0ODIuNTY4IiBzdHlsZT0iZW5hYmxlLWJhY2tncm91bmQ6bmV3IDAgMCA0ODIuNTY4IDQ4Mi41Njg7IiB4bWw6c3BhY2U9InByZXNlcnZlIj4NCjxnPg0KCTxnPg0KCQk8cGF0aCBkPSJNMTE2Ljk5MywyMDMuMjE4YzEzLjQtMS44LDI2LjgsMi44LDM2LjMsMTIuM2wyNCwyNGwyMi43LTIyLjZsLTMyLjgtMzIuN2MtNS4xLTUuMS01LjEtMTMuNCwwLTE4LjVzMTMuNC01LjEsMTguNSwwDQoJCQlsMzIuOCwzMi44bDIyLjctMjIuNmwtMjQuMS0yNC4xYy05LjUtOS41LTE0LjEtMjMtMTIuMy0zNi4zYzQtMzAuNC01LjctNjIuMi0yOS04NS42Yy0yMy44LTIzLjgtNTYuNC0zMy40LTg3LjMtMjguOA0KCQkJYy00LjksMC43LTYuOSw2LjgtMy40LDEwLjNsMzAuOSwzMC45YzE0LjcsMTQuNywxNC43LDM4LjUsMCw1My4xbC0xOSwxOWMtMTQuNywxNC43LTM4LjUsMTQuNy01My4xLDBsLTMxLTMwLjkNCgkJCWMtMy41LTMuNS05LjUtMS41LTEwLjMsMy40Yy00LjYsMzAuOSw1LDYzLjUsMjguOCw4Ny4zQzU0Ljc5MywxOTcuNTE4LDg2LjU5MywyMDcuMjE4LDExNi45OTMsMjAzLjIxOHoiLz4NCgkJPHBhdGggZD0iTTMwOS4xOTMsMjQzLjkxOGwtMjIuNywyMi42bDEzNC44LDEzNC44YzUuMSw1LjEsNS4xLDEzLjQsMCwxOC41cy0xMy40LDUuMS0xOC41LDBsLTEzNC44LTEzNC44bC0yMi43LDIyLjZsMTM4LjksMTM4LjkNCgkJCWMxNy42LDE3LjYsNDYuMSwxNy41LDYzLjctMC4xczE3LjYtNDYuMSwwLjEtNjMuN0wzMDkuMTkzLDI0My45MTh6Ii8+DQoJCTxwYXRoIGQ9Ik0zNjEuMjkzLDE1My45MThoNTkuOWw1OS45LTExOS43bC0yOS45LTI5LjlsLTExOS44LDU5Ljh2NTkuOWwtMTYyLjgsMTYyLjNsLTI5LjMtMjkuMmwtMTE4LDExOA0KCQkJYy0yNC42LDI0LjYtMjQuNiw2NC40LDAsODlzNjQuNCwyNC42LDg5LDBsMTE4LTExOGwtMjkuOS0yOS45TDM2MS4yOTMsMTUzLjkxOHoiLz4NCgk8L2c+DQo8L2c+DQo8Zz4NCjwvZz4NCjxnPg0KPC9nPg0KPGc+DQo8L2c+DQo8Zz4NCjwvZz4NCjxnPg0KPC9nPg0KPGc+DQo8L2c+DQo8Zz4NCjwvZz4NCjxnPg0KPC9nPg0KPGc+DQo8L2c+DQo8Zz4NCjwvZz4NCjxnPg0KPC9nPg0KPGc+DQo8L2c+DQo8Zz4NCjwvZz4NCjxnPg0KPC9nPg0KPGc+DQo8L2c+DQo8L3N2Zz4NCg==');
+                background-position: center center;
+                background-size: cover;
+                filter: invert();
+                opacity: 0.4;
+                width: 24px;
+                height: 24px;
+                transition: opacity 0.25s ease-out;
+            }
+
+            .card .settings:hover {
+                cursor: pointer;
+                opacity: 1;
+                transition: opacity 0.25s ease-out;
+            }
+
+            .settingsOverlay iframe {
+                margin: 0;
+                padding: 0;
+                border: 0;
+                width: 100%;
+                min-height: 60vh;
+            }
+
+            .ui.button.applicationSettings {
+                float: right;
+            }
+
         </style>
     </head>
-    <body class="dark">
+    <body class="dark dimmable">
+        <div class="ui active dimmer global-loader-dimmer">
+            <div class="ui text loader">Connecting...</div>
+        </div>
+
+        <div class="ui icon button black applicationSettings"><i class="icon cog"></i></div>
+
         <h1>Tally Overview</h1>
 
-        <div class="row">
-            <div class="card offline main" data-channel="1">1</div>
-            <div class="card offline main" data-channel="2">2</div>
-            <div class="card offline main" data-channel="3">3</div>
-            <div class="card offline main" data-channel="4">4</div>
-            <div class="card offline main" data-channel="5">5</div>
-            <div class="card offline main" data-channel="6">6</div>
-            <div class="card offline main" data-channel="7">7</div>
-            <div class="card offline main" data-channel="8">8</div>
-            <div class="card offline mini" data-channel="3010">MP1</div>
-            <div class="card offline mini" data-channel="3020">MP2</div>
-            <div class="card offline mini" data-channel="6000">S/SRC</div>
-            <div class="card offline mini" data-channel="">BLACK</div>
+        <div class="ui stackable grid">
+            <div class="doubling twelve column row">
+                <div class="column"><div class="card offline main" data-channel="1"><span class="talkback-channel" title="Change Intercom Channel">-</span><span class="settings" title="Tally Configuration"></span>1</div></div>
+                <div class="column"><div class="card offline main" data-channel="2"><span class="talkback-channel" title="Change Intercom Channel">-</span><span class="settings" title="Tally Configuration"></span>2</div></div>
+                <div class="column"><div class="card offline main" data-channel="3"><span class="talkback-channel" title="Change Intercom Channel">-</span><span class="settings" title="Tally Configuration"></span>3</div></div>
+                <div class="column"><div class="card offline main" data-channel="4"><span class="talkback-channel" title="Change Intercom Channel">-</span><span class="settings" title="Tally Configuration"></span>4</div></div>
+                <div class="column"><div class="card offline main" data-channel="5"><span class="talkback-channel" title="Change Intercom Channel">-</span><span class="settings" title="Tally Configuration"></span>5</div></div>
+                <div class="column"><div class="card offline main" data-channel="6"><span class="talkback-channel" title="Change Intercom Channel">-</span><span class="settings" title="Tally Configuration"></span>6</div></div>
+                <div class="column"><div class="card offline main" data-channel="7"><span class="talkback-channel" title="Change Intercom Channel">-</span><span class="settings" title="Tally Configuration"></span>7</div></div>
+                <div class="column"><div class="card offline main" data-channel="8"><span class="talkback-channel" title="Change Intercom Channel">-</span><span class="settings" title="Tally Configuration"></span>8</div></div>
+                <div class="column"><div class="card offline mini" data-channel="3010"><span class="talkback-channel" title="Change Intercom Channel">-</span><span class="settings" title="Tally Configuration"></span>MP1</div></div>
+                <div class="column"><div class="card offline mini" data-channel="3020"><span class="talkback-channel" title="Change Intercom Channel">-</span><span class="settings" title="Tally Configuration"></span>MP2</div></div>
+                <div class="column"><div class="card offline mini" data-channel="6000"><span class="talkback-channel" title="Change Intercom Channel">-</span><span class="settings" title="Tally Configuration"></span>S/SRC</div></div>
+                <div class="column"><div class="card offline mini" data-channel=""><span class="talkback-channel" title="Change Intercom Channel">-</span><span class="settings" title="Tally Configuration"></span>BLACK</div></div>
+            </div>
+
         </div>
 
         <hr>
@@ -110,13 +208,116 @@
         <div id="log">
         </div>
 
+        <div class="ui basic modal disconnected">
+            <div class="ui icon header">
+                <i class="exclamation triangle icon"></i>
+                Disconnected
+            </div>
+            <div class="content">
+                <p style="text-align: center">Please reload the page to try to connect again!</p>
+            </div>
+        </div>
+
+        <div class="ui large modal settingsOverlay">
+            <i class="close icon"></i>
+            <div class="header">Tally Configuration</div>
+            <div class="content">
+                <iframe></iframe>
+            </div>
+        </div>
+
+        <form class="ui modal talkback-channel">
+            <i class="close icon"></i>
+            <div class="header">
+                X32 Intercom/Talkback Microphone Channel (Tally <span class="tally"></span>)
+            </div>
+            <div class="content">
+                <div class="description">
+                    <div class="ui labeled input">
+                        <div class="ui label">
+                            Channel
+                        </div>
+                        <input name="channel" type="number" min="1" max="32">
+                    </div>
+                </div>
+                <p>Leave empty to remove the intercom configuration from this Tally.</p>
+            </div>
+            <div class="actions">
+                <div class="ui deny button">
+                    Cancel
+                </div>
+                <button class="ui positive button">
+                    Save
+                </button>
+            </div>
+        </form>
+
+        <form class="ui modal applicationSettings">
+            <i class="close icon"></i>
+            <div class="header">
+                Settings
+            </div>
+            <div class="content">
+                <div class="ui form">
+                    <h4 class="ui dividing header">ATEM</h4>
+                    <div class="field">
+                        <div class="ui checkbox">
+                            <input name="atem[use_mdns]:boolean" type="checkbox" tabindex="0" class="hidden" data-unchecked-value="false">
+                            <label>Autodiscover via mDNS</label>
+                        </div>
+                    </div>
+                    <div class="field">
+                        <label>mDNS Name</label>
+                        <input type="text" name="atem[mdns_name]" placeholder="ATEM Mini Extreme ISO._blackmagic._tcp.local">
+                    </div>
+                    <div class="field">
+                        <label>IP address (if mDNS is disabled)</label>
+                        <input type="text" name="atem[host]" placeholder="192.168.23.101">
+                    </div>
+
+                    <h4 class="ui dividing header">Intercom</h4>
+                    <div class="field">
+                        <label>X32 IP address (for Intercom unmuting)</label>
+                        <input type="text" name="x32[host]" placeholder="192.168.23.202">
+                    </div>
+                    <div class="ui orange nag"><div class="title">For those settings to become effective, a restart might be necessary.</div><i class="close icon"></i></div>
+                </div>
+            </div>
+            <div class="actions">
+                <div class="ui deny button">
+                    Cancel
+                </div>
+                <button class="ui positive button">
+                    Save
+                </button>
+            </div>
+        </form>
+
+
+
         <script src="jquery-3.6.0.min.js"></script>
+        <script src="node_modules/jquery-serializejson/jquery.serializejson.min.js"></script>
+        <script src="node_modules/fomantic-ui-css/semantic.min.js"></script>
         <script>
+            const isObject = function (item) {
+                return (item && typeof item === 'object' && !Array.isArray(item));
+            }
+
             $(document).ready(() => {
-                var ws = new WebSocket('ws://localhost:8091/');
+                //var ws = new WebSocket('ws://localhost:8091/');
+                const ws = new WebSocket('ws://' + window.location.hostname + ':8091/');
                 ws.onopen = function() {
                     console.log('WebSocket Client Connected');
+                    $('.ui.global-loader-dimmer').removeClass('active');
                     //ws.send('Hi this is web client.');
+                };
+                ws.onclose = function() {
+                    $('.ui.modal.disconnected')
+                        .modal({
+                            closable: false,
+                        })
+                        .modal('show')
+                    ;
                 };
                 ws.onmessage = (e) => {
                     var msg = JSON.parse(e.data)
@@ -144,6 +345,7 @@
                             $button.removeClass("offline");
                         } else {
                             $button.addClass("offline");
+                            $button.removeClass("has-settings");
                         }
                     } else if (msg.type === "talkback") {
                         var $button = $(".card[data-channel='" + msg.data.channel + "']")
@@ -157,12 +359,126 @@
                         } else {
                             $button.removeClass("talkbackActive");
                         }
+                    } else if (msg.type === "tallyHostname") {
+                        var $button = $(".card[data-channel='" + msg.data.channel + "']")
+
+                        if ($button.length == 0) {
+                            return
+                        }
+
+                        $button.addClass("has-settings");
+                        $button.data("tallyHostname", msg.data.hostname);
+                    } else if (msg.type === "talkbackChannel") {
+                        var $button = $(".card[data-channel='" + msg.data.channel + "']")
+
+                        if ($button.length == 0) {
+                            return
+                        }
+
+                        const talkbackChannel = msg.data.talkbackChannel
+                        if (talkbackChannel) {
+                            $button.addClass("has-talkback");
+                            $button.data("talkbackChannel", talkbackChannel);
+                            $button.find('.talkback-channel').html(talkbackChannel);
+                        } else {
+                            $button.removeClass("has-talkback");
+                            $button.data("talkbackChannel", '');
+                            $button.find('.talkback-channel').html('-');
+                        }
+                    } else if (msg.type === "settings") {
+                        const $form = $('.ui.modal.applicationSettings');
+                        const fillSettingsForm = function (data, prefix, suffix) {
+                            for (key in data) {
+                                console.log(key);
+                                if (isObject(data[key])) {
+                                    fillSettingsForm(data[key], prefix + key + '[', suffix + ']');
+                                } else if (typeof data[key] == 'boolean') {
+                                    $form.find('[name="' + prefix + key + suffix + '"],[name="' + prefix + key + suffix + ':boolean"]').val(data[key]);
+                                    $form.find('[type="checkbox"][name="' + prefix + key + suffix + '"],[type="checkbox"][name="' + prefix + key + suffix + ':boolean"]').val(data[key]).prop('checked', data[key]);
+                                } else {
+                                    $form.find('[name="' + prefix + key + suffix + '"]').val(data[key]);
+                                }
+                            }
+                        }
+
+                        fillSettingsForm(msg.data, '', '');
                     } else if (msg.type === "log") {
                         var $log = $("#log");
                         $log.append(msg.data.msg + "<br>");
                         $log.scrollTop($log[0].scrollHeight);
                     }
                 };
+
+                $('.card').on('click', '.settings', function () {
+                    const hostname = $(this).closest('.card').data('tallyHostname');
+
+                    if (hostname) {
+                        //window.open('http://' + hostname + '.local');
+                        const settingsOverlay = $('.settingsOverlay');
+                        settingsOverlay.find('iframe').prop('src', 'http://' + hostname + '.local');
+
+                        $('.ui.modal.settingsOverlay')
+                            .modal('show')
+                        ;
+                    }
+                });
+
+                $('.card').on('click', '.talkback-channel', function () {
+                    const channel = $(this).closest('.card').data('channel');
+                    const $input = $('.ui.modal.talkback-channel').find('input[name="channel"]')
+                    $('.ui.modal.talkback-channel .tally').html(channel)
+                    $('.ui.modal.talkback-channel')
+                        .modal({
+                            onApprove: function () {
+                                ws.send(JSON.stringify({
+                                    type: 'changeIntercomChannel',
+                                    data: {
+                                        channel: channel,
+                                        intercomChannel: $input.val(),
+                                    }
+                                }));
+                            }
+                        })
+                        .modal('show');
+
+                    $input.val($(this).text());
+                });
+
+                $('form.ui.modal').on('submit', (e) => {
+                    e.preventDefault();
+                    return false;
+                });
+
+                $('.button.applicationSettings').on('click', function () {
+                    ws.send(JSON.stringify({
+                        type: 'getSettings',
+                    }));
+                    $('.ui.modal.applicationSettings')
+                        .modal({
+                            onApprove: function () {
+                                ws.send(JSON.stringify({
+                                    type: 'changeSettings',
+                                    data: $(this).serializeJSON({
+                                        checkboxUncheckedValue: 'false',
+                                    }),
+                                }));
+                            }
+                        })
+                        .modal('show')
+                    ;
+                });
+
+                $('.ui.checkbox')
+                    .checkbox()
+                ;
+
+                $('.ui.nag')
+                    .nag()
+                ;
+
+                $('.ui.nag')
+                    .nag()
+                ;
             });
         </script>
     </body>

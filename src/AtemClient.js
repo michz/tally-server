@@ -49,7 +49,7 @@ module.exports = class AtemClient {
                 this.logger.debug(JSON.stringify(state.video.mixEffects))
                 this.logger.info(pathToChange)
 
-                const mixEffectsFilterRegex = new RegExp(".*video\.mixEffects.*", "g")
+                const mixEffectsFilterRegex = new RegExp(".*video\.mixEffects.*|.*video\.downstreamKeyers.*", "g")
                 if (!mixEffectsFilterRegex.test(pathToChange)) {
                     return
                 }
@@ -62,21 +62,24 @@ module.exports = class AtemClient {
     handleMixEffectsChanges(mixEffects) {
         let currentChannels = {};
 
-        mixEffects.forEach((effect) => {
-            // Program has highest priority, so always set.
-            if (effect.programInput) {
-                currentChannels[effect.programInput] = codeTallyProgram;
-            }
+        // @source https://github.com/nrkno/sofie-atem-connection/pull/57
 
-            // Set Preview only if it is not yet set to Program
-            if (effect.previewInput && codeTallyProgram !== currentChannels[effect.previewInput]) {
-                // During a Transition, both are on Program
-                if (effect.transitionPosition && effect.transitionPosition.inTransition) {
-                    currentChannels[effect.previewInput] = codeTallyProgram;
-                } else {
-                    currentChannels[effect.previewInput] = codeTallyPreview;
-                }
+        // @TODO `me` parameter? which value?
+        const inputsOnPreview = this.atem.listVisibleInputs('preview', 0);
+        const inputsOnProgram = this.atem.listVisibleInputs('program', 0);
+
+        const checkAndAddToCurrentChanels = (input, previewOrProgram) => {
+            // If already on PGM, do not change. PGM has always highest priority.
+            if (input && codeTallyProgram !== currentChannels[input]) {
+                currentChannels[input] = previewOrProgram;
             }
+        };
+
+        inputsOnProgram.forEach((input) => {
+            checkAndAddToCurrentChanels(input, codeTallyProgram);
+        });
+        inputsOnPreview.forEach((input) => {
+            checkAndAddToCurrentChanels(input, codeTallyPreview);
         });
 
         Object.keys(this.lastTallyChannels).forEach((channel) => {

@@ -5,6 +5,8 @@ const os = require('os')
 const path = require("path")
 const YAML = require('yaml')
 
+const configFilePath = './config.yml'
+
 if (process.argv.includes("-h") || process.argv.includes("--help")) {
     console.log("No command line parameters available.")
     console.log("Please provide a config file at current working directory.")
@@ -44,16 +46,21 @@ if (process.argv.includes("-h") || process.argv.includes("--help")) {
     const X32Client = require("./X32Client.js")
     const Log = require("./Log.js")
     const LogToCallbackTransport = require('./LogToCallbackTransport.js')
+    const ObjectMerger = require('./ObjectMerger')
 
     const logToCallbackTransport = new LogToCallbackTransport();
     const log = new Log(logToCallbackTransport)
     const logger = log.getLogger()
 
     // Load configuration
-    const file = fs.readFileSync('./config.yml', 'utf8')
+    const file = fs.readFileSync(configFilePath, 'utf8')
     const config = YAML.parse(file)
     logger.info('Config: ' + JSON.stringify(config, null, 2));
 
+    // Save configuration method
+    const saveConfiguration = function (config, path) {
+        fs.writeFileSync(path, YAML.stringify(config), { encoding: "utf8" });
+    }
 
     // mDNS Client/Server
     const mdnsClient = new MdnsClient(logger)
@@ -88,8 +95,10 @@ if (process.argv.includes("-h") || process.argv.includes("--help")) {
         (topic, payload) => {
             const onlineRE = /tally\/(\d+)\/online/
             const talkbackRE = /tally\/(\d+)\/talkback/
+            const hostnameRE = /tally\/(\d+)\/hostname/
             const onlineMatches = topic.match(onlineRE)
             const talkbackMatches = topic.match(talkbackRE)
+            const hostnameMatches = topic.match(hostnameRE)
             if (onlineMatches !== null && onlineMatches.length > 0) {
                 controlServer.sendToWebsocketClients({
                     type: 'online',
@@ -118,6 +127,18 @@ if (process.argv.includes("-h") || process.argv.includes("--help")) {
                     data: {
                         channel: tally,
                         state: !muteState,
+                    },
+                })
+            } else if (hostnameMatches !== null && hostnameMatches.length > 0) {
+                const tally = hostnameMatches[1]
+                const hostname = String(payload)
+
+                // Then inform Websocket clients (Control UI)
+                controlServer.sendToWebsocketClients({
+                    type: 'tallyHostname',
+                    data: {
+                        channel: tally,
+                        hostname: hostname,
                     },
                 })
             }
@@ -159,7 +180,15 @@ if (process.argv.includes("-h") || process.argv.includes("--help")) {
         })
     })
 
+    const sendSettingsToWebsocketClients = function () {
+        controlServer.sendToWebsocketClients({
+            type: "settings",
+            data: config,
+        })
+    }
+
     // Additional Wiring
+    // On initial connection, send current state to client
     controlServer.setWebsocketClientConnectedCallback((connection) => {
         for (const message of mqttBroker.getBroker().persistence._retained) {
             const reOnline = /tally\/(\d+)\/online/
@@ -187,8 +216,79 @@ if (process.argv.includes("-h") || process.argv.includes("--help")) {
                     },
                 })
             }
+
+            const reHostname = /tally\/(\d+)\/hostname/
+            matches = message["topic"].match(reHostname)
+            if (matches !== null && matches.length > 0) {
+                const payload = message.payload.toString('utf-8')
+                controlServer.sendToWebsocketClients({
+                    type: 'tallyHostname',
+                    data: {
+                        channel: matches[1],
+                        hostname: payload,
+                    },
+                })
+            }
+        }
+
+        for (const tally of Object.keys(config['x32']['tally_mapping'])) {
+            controlServer.sendToWebsocketClients({
+                type: 'talkbackChannel',
+                data: {
+                    channel: tally,
+                    talkbackChannel: config['x32']['tally_mapping'][tally],
+                },
+            })
         }
     })
+    // Websocket client (aka browser) sent a message (command, config change, ...)
+    controlServer.setWebsocketClientSentMessageCallback((message) => {
+        if (message.type === 'changeIntercomChannel') {
+            const tally = message.data.channel
+            const intercomChannel = parseInt(message.data.intercomChannel)
+            if (!tally) {
+                logger.error('Malformed changeIntercomChannel command received: ' + JSON.stringify(message))
+                return
+            }
+
+            // Backup config
+            saveConfiguration(config, configFilePath + '.bak')
+
+            if (intercomChannel) {
+                config['x32']['tally_mapping'][tally] = intercomChannel
+            } else {
+                delete(config['x32']['tally_mapping'][tally])
+            }
+
+            // Save changed config
+            saveConfiguration(config, configFilePath)
+
+            // Send change to websocket clients
+            controlServer.sendToWebsocketClients({
+                type: 'talkbackChannel',
+                data: {
+                    channel: tally,
+                    talkbackChannel: intercomChannel,
+                },
+            })
+        } else if (message.type === 'changeSettings') {
+            // Backup config
+            saveConfiguration(config, configFilePath + '.bak')
+
+            // Merge existing config and new config
+            ObjectMerger(config, message.data)
+
+            // Save changed config
+            saveConfiguration(config, configFilePath)
+
+            // Inform clients about new config
+            sendSettingsToWebsocketClients();
+        } else if (message.type === 'getSettings') {
+            // Inform clients about config
+            sendSettingsToWebsocketClients();
+        }
+    })
+
 
     // Run Control Webserver
     controlServer.run()
