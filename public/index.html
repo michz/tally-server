@@ -8,12 +8,6 @@
 
         <style>
             body.dark {
-                --bg-color: #000;
-                --bg-secondary-color: #131316;
-                --font-color: #f5f5f5;
-                --color-grey: #ccc;
-                --color-darkGrey: #777;
-
                 margin: 0;
                 padding: 0 2vw;
 
@@ -28,18 +22,44 @@
             }
 
 
-            .dark h1, h2, h3, h4, h5, p, span, i, div {
+            .dark > h1, .dark :not(.ui.modal) h1,
+            .dark > h2, .dark :not(.ui.modal) h2,
+            .dark > h3, .dark :not(.ui.modal) h3,
+            .dark > h4, .dark :not(.ui.modal) h4,
+            .dark > h5, .dark :not(.ui.modal) h5,
+            .dark > p, .dark :not(.ui.modal) p,
+            .dark > span, .dark :not(.ui.modal) span,
+            .dark > i, .dark :not(.ui.modal) i/*,
+            .dark > div , .dark :not(.ui.modal) div*/ {
                 color: #f5f5f5;
             }
 
-            .dark .ui.modal h1, h2, h3, h4, h5, p, span, i, div {
-                color: #000000;
+
+            .dark .ui.modal h1,
+            .dark .ui.modal h2,
+            .dark .ui.modal h3,
+            .dark .ui.modal h4,
+            .dark .ui.modal h5,
+            .dark .ui.modal p,
+            .dark .ui.modal span,
+            .dark .ui.modal i,
+            .dark .ui.modal div {
+                color: unset;
             }
+
+            /*.dark .ui.modal p {
+                color: #000000;
+            }*/
 
             .card {
                 position: relative;
+                /*
                 margin: 2rem 1vw;
                 padding: 1.5em 1rem 1.5em 1rem;
+                */
+                margin: 2rem auto;
+                padding-top: 1.5em;
+                padding-bottom: 1.5em;
 
                 background-color: rgb(39, 39, 39);
                 color: #777;
@@ -55,14 +75,10 @@
                 box-shadow: none;
             }
 
-            .card.main {
-                width: 6vw;
-            }
-
             .card.mini {
-                padding: 4.5em 0.25rem 0 0.25rem;
-                width: 4vw;
+                padding: 1rem 0;
                 font-size: 1rem;
+                max-width: 5rem;
             }
 
             .card.offline {
@@ -114,6 +130,10 @@
                 transition: opacity 0.25s ease-out;
             }
 
+            .card.mini .talkback-channel {
+                font-size: 1.2em;
+            }
+
             .card .talkback-channel:hover {
                 cursor: pointer;
                 opacity: 1;
@@ -153,20 +173,23 @@
     <body class="dark">
         <h1>Tally Overview</h1>
 
-        <div class="ui grid">
+        <div class="ui stackable grid">
+            <div class="doubling twelve column row">
+                <div class="column"><div class="card offline main" data-channel="1"><span class="talkback-channel" title="Change Intercom Channel">-</span><span class="settings" title="Tally Configuration"></span>1</div></div>
+                <div class="column"><div class="card offline main" data-channel="2"><span class="talkback-channel" title="Change Intercom Channel">-</span><span class="settings" title="Tally Configuration"></span>2</div></div>
+                <div class="column"><div class="card offline main" data-channel="3"><span class="talkback-channel" title="Change Intercom Channel">-</span><span class="settings" title="Tally Configuration"></span>3</div></div>
+                <div class="column"><div class="card offline main" data-channel="4"><span class="talkback-channel" title="Change Intercom Channel">-</span><span class="settings" title="Tally Configuration"></span>4</div></div>
+                <div class="column"><div class="card offline main" data-channel="5"><span class="talkback-channel" title="Change Intercom Channel">-</span><span class="settings" title="Tally Configuration"></span>5</div></div>
+                <div class="column"><div class="card offline main" data-channel="6"><span class="talkback-channel" title="Change Intercom Channel">-</span><span class="settings" title="Tally Configuration"></span>6</div></div>
+                <div class="column"><div class="card offline main" data-channel="7"><span class="talkback-channel" title="Change Intercom Channel">-</span><span class="settings" title="Tally Configuration"></span>7</div></div>
+                <div class="column"><div class="card offline main" data-channel="8"><span class="talkback-channel" title="Change Intercom Channel">-</span><span class="settings" title="Tally Configuration"></span>8</div></div>
+                <div class="column"><div class="card offline mini" data-channel="3010"><span class="talkback-channel" title="Change Intercom Channel">-</span><span class="settings" title="Tally Configuration"></span>MP1</div></div>
+                <div class="column"><div class="card offline mini" data-channel="3020"><span class="talkback-channel" title="Change Intercom Channel">-</span><span class="settings" title="Tally Configuration"></span>MP2</div></div>
+                <div class="column"><div class="card offline mini" data-channel="6000"><span class="talkback-channel" title="Change Intercom Channel">-</span><span class="settings" title="Tally Configuration"></span>S/SRC</div></div>
+                <div class="column"><div class="card offline mini" data-channel=""><span class="talkback-channel" title="Change Intercom Channel">-</span><span class="settings" title="Tally Configuration"></span>BLACK</div></div>
+            </div>
             <div class="row">
-                <div class="card offline main" data-channel="1"><span class="talkback-channel" title="Change Intercom Channel">-</span><span class="settings" title="Tally Configuration"></span>1</div>
-                <div class="card offline main" data-channel="2"><span class="talkback-channel" title="Change Intercom Channel">-</span><span class="settings" title="Tally Configuration"></span>2</div>
-                <div class="card offline main" data-channel="3"><span class="talkback-channel" title="Change Intercom Channel">-</span><span class="settings" title="Tally Configuration"></span>3</div>
-                <div class="card offline main" data-channel="4"><span class="talkback-channel" title="Change Intercom Channel">-</span><span class="settings" title="Tally Configuration"></span>4</div>
-                <div class="card offline main" data-channel="5"><span class="talkback-channel" title="Change Intercom Channel">-</span><span class="settings" title="Tally Configuration"></span>5</div>
-                <div class="card offline main" data-channel="6"><span class="talkback-channel" title="Change Intercom Channel">-</span><span class="settings" title="Tally Configuration"></span>6</div>
-                <div class="card offline main" data-channel="7"><span class="talkback-channel" title="Change Intercom Channel">-</span><span class="settings" title="Tally Configuration"></span>7</div>
-                <div class="card offline main" data-channel="8"><span class="talkback-channel" title="Change Intercom Channel">-</span><span class="settings" title="Tally Configuration"></span>8</div>
-                <div class="card offline mini" data-channel="3010"><span class="talkback-channel" title="Change Intercom Channel">-</span><span class="settings" title="Tally Configuration"></span>MP1</div>
-                <div class="card offline mini" data-channel="3020"><span class="talkback-channel" title="Change Intercom Channel">-</span><span class="settings" title="Tally Configuration"></span>MP2</div>
-                <div class="card offline mini" data-channel="6000"><span class="talkback-channel" title="Change Intercom Channel">-</span><span class="settings" title="Tally Configuration"></span>S/SRC</div>
-                <div class="card offline mini" data-channel=""><span class="talkback-channel" title="Change Intercom Channel">-</span><span class="settings" title="Tally Configuration"></span>BLACK</div>
+                <div class="ui icon button black applicationSettings"><i class="icon cog"></i></div>
             </div>
         </div>
 
@@ -190,7 +213,7 @@
             <div class="header">
                 X32 Intercom/Talkback Microphone Channel (Tally <span class="tally"></span>)
             </div>
-            <div class="image content">
+            <div class="content">
                 <div class="description">
                     <div class="ui labeled input">
                         <div class="ui label">
@@ -202,22 +225,69 @@
                 <p>Leave empty to remove the intercom configuration from this Tally.</p>
             </div>
             <div class="actions">
-                <div class="ui black deny button">
+                <div class="ui deny button">
                     Cancel
                 </div>
                 <button class="ui positive button">
                     Save
+                </button>
             </div>
+        </form>
+
+        <form class="ui modal applicationSettings">
+            <i class="close icon"></i>
+            <div class="header">
+                Settings
+            </div>
+            <div class="content">
+                <div class="ui form">
+                    <h4 class="ui dividing header">ATEM</h4>
+                    <div class="field">
+                        <div class="ui checkbox">
+                            <input name="atem[use_mdns]:boolean" type="checkbox" tabindex="0" class="hidden" data-unchecked-value="false">
+                            <label>Autodiscover via mDNS</label>
+                        </div>
+                    </div>
+                    <div class="field">
+                        <label>mDNS Name</label>
+                        <input type="text" name="atem[mdns_name]" placeholder="ATEM Mini Extreme ISO._blackmagic._tcp.local">
+                    </div>
+                    <div class="field">
+                        <label>IP address (if mDNS is disabled)</label>
+                        <input type="text" name="atem[host]" placeholder="192.168.23.101">
+                    </div>
+
+                    <h4 class="ui dividing header">Intercom</h4>
+                    <div class="field">
+                        <label>X32 IP address (for Intercom unmuting)</label>
+                        <input type="text" name="x32[host]" placeholder="192.168.23.202">
+                    </div>
+                    <div class="ui orange nag"><div class="title">For those settings to become effective, a restart might be necessary.</div><i class="close icon"></i></div>
+                </div>
+            </div>
+            <div class="actions">
+                <div class="ui deny button">
+                    Cancel
+                </div>
+                <button class="ui positive button">
+                    Save
+                </button>
             </div>
         </form>
 
 
 
         <script src="jquery-3.6.0.min.js"></script>
+        <script src="node_modules/jquery-serializejson/jquery.serializejson.min.js"></script>
         <script src="node_modules/fomantic-ui-css/semantic.min.js"></script>
         <script>
+            const isObject = function (item) {
+                return (item && typeof item === 'object' && !Array.isArray(item));
+            }
+
             $(document).ready(() => {
-                var ws = new WebSocket('ws://localhost:8091/');
+                //var ws = new WebSocket('ws://localhost:8091/');
+                const ws = new WebSocket('ws://' + window.location.hostname + ':8091/');
                 ws.onopen = function() {
                     console.log('WebSocket Client Connected');
                     //ws.send('Hi this is web client.');
@@ -288,7 +358,23 @@
                             $button.data("talkbackChannel", '');
                             $button.find('.talkback-channel').html('-');
                         }
+                    } else if (msg.type === "settings") {
+                        const $form = $('.ui.modal.applicationSettings');
+                        const fillSettingsForm = function (data, prefix, suffix) {
+                            for (key in data) {
+                                console.log(key);
+                                if (isObject(data[key])) {
+                                    fillSettingsForm(data[key], prefix + key + '[', suffix + ']');
+                                } else if (typeof data[key] == 'boolean') {
+                                    $form.find('[name="' + prefix + key + suffix + '"],[name="' + prefix + key + suffix + ':boolean"]').val(data[key]);
+                                    $form.find('[type="checkbox"][name="' + prefix + key + suffix + '"],[type="checkbox"][name="' + prefix + key + suffix + ':boolean"]').val(data[key]).prop('checked', data[key]);
+                                } else {
+                                    $form.find('[name="' + prefix + key + suffix + '"]').val(data[key]);
+                                }
+                            }
+                        }
 
+                        fillSettingsForm(msg.data, '', '');
                     } else if (msg.type === "log") {
                         var $log = $("#log");
                         $log.append(msg.data.msg + "<br>");
@@ -330,6 +416,38 @@
 
                     $input.val($(this).text());
                 });
+
+                $('form.ui.modal').on('submit', (e) => {
+                    e.preventDefault();
+                    return false;
+                });
+
+                $('.button.applicationSettings').on('click', function () {
+                    ws.send(JSON.stringify({
+                        type: 'getSettings',
+                    }));
+                    $('.ui.modal.applicationSettings')
+                        .modal({
+                            onApprove: function () {
+                                ws.send(JSON.stringify({
+                                    type: 'changeSettings',
+                                    data: $(this).serializeJSON({
+                                        checkboxUncheckedValue: 'false',
+                                    }),
+                                }));
+                            }
+                        })
+                        .modal('show')
+                    ;
+                });
+
+                $('.ui.checkbox')
+                    .checkbox()
+                ;
+
+                $('.ui.nag')
+                    .nag()
+                ;
             });
         </script>
     </body>

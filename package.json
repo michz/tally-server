@@ -14,6 +14,7 @@
     "aedes": "^0.46.3",
     "atem-connection": "^2.4.0",
     "fomantic-ui-css": "^2.8.8",
+    "jquery-serializejson": "^3.2.1",
     "m32": "^0.0.9",
     "mqtt": "^4.3.6",
     "multicast-dns": "^7.2.4",

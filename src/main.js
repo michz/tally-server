@@ -46,6 +46,7 @@ if (process.argv.includes("-h") || process.argv.includes("--help")) {
     const X32Client = require("./X32Client.js")
     const Log = require("./Log.js")
     const LogToCallbackTransport = require('./LogToCallbackTransport.js')
+    const ObjectMerger = require('./ObjectMerger')
 
     const logToCallbackTransport = new LogToCallbackTransport();
     const log = new Log(logToCallbackTransport)
@@ -179,6 +180,13 @@ if (process.argv.includes("-h") || process.argv.includes("--help")) {
         })
     })
 
+    const sendSettingsToWebsocketClients = function () {
+        controlServer.sendToWebsocketClients({
+            type: "settings",
+            data: config,
+        })
+    }
+
     // Additional Wiring
     // On initial connection, send current state to client
     controlServer.setWebsocketClientConnectedCallback((connection) => {
@@ -263,6 +271,21 @@ if (process.argv.includes("-h") || process.argv.includes("--help")) {
                     talkbackChannel: intercomChannel,
                 },
             })
+        } else if (message.type === 'changeSettings') {
+            // Backup config
+            saveConfiguration(config, configFilePath + '.bak')
+
+            // Merge existing config and new config
+            ObjectMerger(config, message.data)
+
+            // Save changed config
+            saveConfiguration(config, configFilePath)
+
+            // Inform clients about new config
+            sendSettingsToWebsocketClients();
+        } else if (message.type === 'getSettings') {
+            // Inform clients about config
+            sendSettingsToWebsocketClients();
         }
     })
 
