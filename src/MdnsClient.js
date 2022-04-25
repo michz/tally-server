@@ -16,8 +16,15 @@ module.exports = class MdnsClient {
 
         const that = this;
 
-        this.mdns.on('query', (query) => {
-            const hostname = os.hostname()
+        this.mdns.on('query', (query, rinfo) => {
+            let hostname = os.hostname()
+
+            // Strip '.local' from hostname, if it is already there.
+            // (Confuses some clients...)
+            if (hostname.endsWith('.local')) {
+                hostname = hostname.substr(0, hostname.length - 6)
+            }
+
             const hostnameLocal = hostname + '.local'
             const fullServiceHostname = hostname + '.' + mdns_service + '._tcp.local'
             const serviceName = 'Tally MQTT on ' + fullServiceHostname
