@@ -176,29 +176,28 @@
     </head>
     <body class="dark dimmable">
         <div class="ui active dimmer global-loader-dimmer">
-            <div class="ui text loader">Connecting...</div>
+            <div class="ui text loader"><span data-translatable>status.connecting</span>...</div>
         </div>
 
-        <div class="ui icon button black applicationSettings"><i class="icon cog"></i></div>
+        <div class="ui icon button black applicationSettings" data-translate-title title="button.settings"><i class="icon cog"></i></div>
 
-        <h1>Tally Overview</h1>
+        <h1 data-translatable>header.main</h1>
 
         <div class="ui stackable grid">
             <div class="doubling twelve column row">
-                <div class="column"><div class="card offline main" data-channel="1"><span class="talkback-channel" title="Change Intercom Channel">-</span><span class="settings" title="Tally Configuration"></span>1</div></div>
-                <div class="column"><div class="card offline main" data-channel="2"><span class="talkback-channel" title="Change Intercom Channel">-</span><span class="settings" title="Tally Configuration"></span>2</div></div>
-                <div class="column"><div class="card offline main" data-channel="3"><span class="talkback-channel" title="Change Intercom Channel">-</span><span class="settings" title="Tally Configuration"></span>3</div></div>
-                <div class="column"><div class="card offline main" data-channel="4"><span class="talkback-channel" title="Change Intercom Channel">-</span><span class="settings" title="Tally Configuration"></span>4</div></div>
-                <div class="column"><div class="card offline main" data-channel="5"><span class="talkback-channel" title="Change Intercom Channel">-</span><span class="settings" title="Tally Configuration"></span>5</div></div>
-                <div class="column"><div class="card offline main" data-channel="6"><span class="talkback-channel" title="Change Intercom Channel">-</span><span class="settings" title="Tally Configuration"></span>6</div></div>
-                <div class="column"><div class="card offline main" data-channel="7"><span class="talkback-channel" title="Change Intercom Channel">-</span><span class="settings" title="Tally Configuration"></span>7</div></div>
-                <div class="column"><div class="card offline main" data-channel="8"><span class="talkback-channel" title="Change Intercom Channel">-</span><span class="settings" title="Tally Configuration"></span>8</div></div>
-                <div class="column"><div class="card offline mini" data-channel="3010"><span class="talkback-channel" title="Change Intercom Channel">-</span><span class="settings" title="Tally Configuration"></span>MP1</div></div>
-                <div class="column"><div class="card offline mini" data-channel="3020"><span class="talkback-channel" title="Change Intercom Channel">-</span><span class="settings" title="Tally Configuration"></span>MP2</div></div>
-                <div class="column"><div class="card offline mini" data-channel="6000"><span class="talkback-channel" title="Change Intercom Channel">-</span><span class="settings" title="Tally Configuration"></span>S/SRC</div></div>
-                <div class="column"><div class="card offline mini" data-channel=""><span class="talkback-channel" title="Change Intercom Channel">-</span><span class="settings" title="Tally Configuration"></span>BLACK</div></div>
+                <div class="column"><div class="card offline main" data-channel="1"><span class="talkback-channel" data-translate-title title="title.change_intercom_channel">-</span><span class="settings" data-translate-title title="title.tally_configuration"></span>1</div></div>
+                <div class="column"><div class="card offline main" data-channel="2"><span class="talkback-channel" data-translate-title title="title.change_intercom_channel">-</span><span class="settings" data-translate-title title="title.tally_configuration"></span>2</div></div>
+                <div class="column"><div class="card offline main" data-channel="3"><span class="talkback-channel" data-translate-title title="title.change_intercom_channel">-</span><span class="settings" data-translate-title title="title.tally_configuration"></span>3</div></div>
+                <div class="column"><div class="card offline main" data-channel="4"><span class="talkback-channel" data-translate-title title="title.change_intercom_channel">-</span><span class="settings" data-translate-title title="title.tally_configuration"></span>4</div></div>
+                <div class="column"><div class="card offline main" data-channel="5"><span class="talkback-channel" data-translate-title title="title.change_intercom_channel">-</span><span class="settings" data-translate-title title="title.tally_configuration"></span>5</div></div>
+                <div class="column"><div class="card offline main" data-channel="6"><span class="talkback-channel" data-translate-title title="title.change_intercom_channel">-</span><span class="settings" data-translate-title title="title.tally_configuration"></span>6</div></div>
+                <div class="column"><div class="card offline main" data-channel="7"><span class="talkback-channel" data-translate-title title="title.change_intercom_channel">-</span><span class="settings" data-translate-title title="title.tally_configuration"></span>7</div></div>
+                <div class="column"><div class="card offline main" data-channel="8"><span class="talkback-channel" data-translate-title title="title.change_intercom_channel">-</span><span class="settings" data-translate-title title="title.tally_configuration"></span>8</div></div>
+                <div class="column"><div class="card offline mini" data-channel="3010"><span class="talkback-channel" data-translate-title title="title.change_intercom_channel">-</span><span class="settings" data-translate-title title="title.tally_configuration"></span>MP1</div></div>
+                <div class="column"><div class="card offline mini" data-channel="3020"><span class="talkback-channel" data-translate-title title="title.change_intercom_channel">-</span><span class="settings" data-translate-title title="title.tally_configuration"></span>MP2</div></div>
+                <div class="column"><div class="card offline mini" data-channel="6000"><span class="talkback-channel" data-translate-title title="title.change_intercom_channel">-</span><span class="settings" data-translate-title title="title.tally_configuration"></span>S/SRC</div></div>
+                <div class="column"><div class="card offline mini" data-channel=""><span class="talkback-channel" data-translate-title title="title.change_intercom_channel">-</span><span class="settings" data-translate-title title="title.tally_configuration"></span>BLACK</div></div>
             </div>
-
         </div>
 
         <hr>
@@ -211,16 +210,16 @@
         <div class="ui basic modal disconnected">
             <div class="ui icon header">
                 <i class="exclamation triangle icon"></i>
-                Disconnected
+                <span data-translatable>header.disconnected</span>
             </div>
             <div class="content">
-                <p style="text-align: center">Please reload the page to try to connect again!</p>
+                <p style="text-align: center" data-translatable>info.reload_to_reconnect</p>
             </div>
         </div>
 
         <div class="ui large modal settingsOverlay">
             <i class="close icon"></i>
-            <div class="header">Tally Configuration</div>
+            <div class="header" data-translatable>header.tally_config</div>
             <div class="content">
                 <iframe></iframe>
             </div>
@@ -229,33 +228,33 @@
         <form class="ui modal talkback-channel">
             <i class="close icon"></i>
             <div class="header">
-                X32 Intercom/Talkback Microphone Channel (Tally <span class="tally"></span>)
+                <span data-translatable>header.tally_intercom_config</span> (Tally <span class="tally"></span>)
             </div>
             <div class="content">
                 <div class="description">
                     <div class="ui labeled input">
-                        <div class="ui label">
-                            Channel
+                        <div class="ui label" data-translatable>
+                            field.channel
                         </div>
                         <input name="channel" type="number" min="1" max="32">
                     </div>
                 </div>
-                <p>Leave empty to remove the intercom configuration from this Tally.</p>
+                <p data-translatable>info.leave_empty_to_reset_intercom</p>
             </div>
             <div class="actions">
-                <div class="ui deny button">
-                    Cancel
+                <div class="ui deny button" data-translatable>
+                    button.cancel
                 </div>
-                <button class="ui positive button">
-                    Save
+                <button class="ui positive button" data-translatable>
+                    button.save
                 </button>
             </div>
         </form>
 
         <form class="ui modal applicationSettings">
             <i class="close icon"></i>
-            <div class="header">
-                Settings
+            <div class="header" data-translatable>
+                header.settings
             </div>
             <div class="content">
                 <div class="ui form">
@@ -263,7 +262,7 @@
                     <div class="field">
                         <div class="ui checkbox">
                             <input name="atem[use_mdns]:boolean" type="checkbox" tabindex="0" class="hidden" data-unchecked-value="false">
-                            <label>Autodiscover via mDNS</label>
+                            <label data-translatable>field.discover_via_mdns</label>
                         </div>
                     </div>
                     <div class="field">
@@ -271,24 +270,24 @@
                         <input type="text" name="atem[mdns_name]" placeholder="ATEM Mini Extreme ISO._blackmagic._tcp.local">
                     </div>
                     <div class="field">
-                        <label>IP address (if mDNS is disabled)</label>
+                        <label data-translatable>field.ip_address_if_not_mdns</label>
                         <input type="text" name="atem[host]" placeholder="192.168.23.101">
                     </div>
 
                     <h4 class="ui dividing header">Intercom</h4>
                     <div class="field">
-                        <label>X32 IP address (for Intercom unmuting)</label>
+                        <label data-translatable>field.ip_address_for_intercom</label>
                         <input type="text" name="x32[host]" placeholder="192.168.23.202">
                     </div>
-                    <div class="ui orange nag"><div class="title">For those settings to become effective, a restart might be necessary.</div><i class="close icon"></i></div>
+                    <div class="ui orange nag"><div class="title" data-translatable>info.settings_restart_necessary</div></div>
                 </div>
             </div>
             <div class="actions">
-                <div class="ui deny button">
-                    Cancel
+                <div class="ui deny button" data-translatable>
+                    button.cancel
                 </div>
-                <button class="ui positive button">
-                    Save
+                <button class="ui positive button" data-translatable>
+                    button.save
                 </button>
             </div>
         </form>
@@ -297,11 +296,107 @@
 
         <script src="jquery-3.6.0.min.js"></script>
         <script src="node_modules/jquery-serializejson/jquery.serializejson.min.js"></script>
+        <script src="node_modules/i18next/i18next.min.js"></script>
+        <script src="node_modules/i18next-browser-languagedetector/i18nextBrowserLanguageDetector.min.js"></script>
         <script src="node_modules/fomantic-ui-css/semantic.min.js"></script>
         <script>
             const isObject = function (item) {
                 return (item && typeof item === 'object' && !Array.isArray(item));
             }
+
+            const i18next = window.i18next;
+
+            i18next.use(window.i18nextBrowserLanguageDetector).init({
+                //lng: 'en', // if you're using a language detector, do not define the lng option
+                detection: {
+                    order: ['querystring', 'cookie', 'localStorage', 'sessionStorage', 'navigator', 'htmlTag'],
+                    caches: null,
+                },
+                debug: true,
+                resources: {
+                    en: {
+                        translation: {
+                            button: {
+                                cancel: 'Cancel',
+                                save: 'Save',
+                                settings: 'Settings',
+                            },
+                            field: {
+                                channel: 'Channel',
+                                discover_via_mdns: 'Autodiscover via mDNS',
+                                ip_address_if_not_mdns: 'IP address (if mDNS is disabled)',
+                                ip_address_for_intercom: 'X32 IP address (for Intercom remote control)',
+                            },
+                            header: {
+                                disconnected: 'Disconnected',
+                                main: 'Tally Control Room',
+                                settings: 'Settings',
+                                tally_config: 'Tally Configuration',
+                                tally_intercom_config: 'X32 Intercom/Talkback Microphone Channel',
+                            },
+                            info: {
+                                leave_empty_to_reset_intercom: 'Leave empty to remove the intercom configuration from this Tally.',
+                                reload_to_reconnect: 'Please reload the page to try to connect again!',
+                                settings_restart_necessary: 'For those settings to become effective, a restart might be necessary.',
+                            },
+                            status: {
+                                connecting: 'Connecting',
+                            },
+                            title: {
+                                change_intercom_channel: 'Change Intercom Channel',
+                                tally_configuration: 'Tally Configuration',
+                            },
+                        },
+                    },
+                    de: {
+                        translation: {
+                            button: {
+                                cancel: 'Abbrechen',
+                                save: 'Speichern',
+                                settings: 'Einstellungen',
+                            },
+                            field: {
+                                channel: 'Kanal',
+                                discover_via_mdns: 'Automatisch via mDNS suchen',
+                                ip_address_if_not_mdns: 'IP-Adresse (wenn mDNS deaktiviert ist)',
+                                ip_address_for_intercom: 'X32 IP-Adresse (für Intercom-Fernsteuerung)',
+                            },
+                            header: {
+                                disconnected: 'Verbindung verloren',
+                                main: 'Tally-Kontrollzentrum',
+                                settings: 'Einstellungen',
+                                tally_config: 'Tally-Einstellungen',
+                                tally_intercom_config: 'X32 Intercom/Talkback Mikrofonkanal',
+                            },
+                            info: {
+                                leave_empty_to_reset_intercom: 'Leer lassen, um die Intercom-Konfiguration von diesem Tally zu entfernen.',
+                                reload_to_reconnect: 'Bitte die Seite neuladen, um Verbindung neu aufbauen!',
+                                settings_restart_necessary: 'Damit Änderungen hier wirksam werden, ist ein Neustart notwendig.',
+                            },
+                            status: {
+                                connecting: "Verbinde",
+                            },
+                            title: {
+                                change_intercom_channel: 'Intercom-Kanal ändern',
+                                tally_configuration: 'Tally-Konfiguration',
+                            },
+                        },
+                    },
+                }
+            });
+
+            $('[data-translatable]').each(function () {
+                const $this = $(this);
+                const key = $this.text().trim();
+                $this.text(i18next.t(key));
+            });
+            $('[data-translate-title]').each(function () {
+                const $this = $(this);
+                const key = $this.prop('title').trim();
+                $this.prop('title', i18next.t(key));
+            });
+
+            //document.getElementById('output').innerHTML = i18next.t('key');
 
             $(document).ready(() => {
                 //var ws = new WebSocket('ws://localhost:8091/');
@@ -389,7 +484,6 @@
                         const $form = $('.ui.modal.applicationSettings');
                         const fillSettingsForm = function (data, prefix, suffix) {
                             for (key in data) {
-                                console.log(key);
                                 if (isObject(data[key])) {
                                     fillSettingsForm(data[key], prefix + key + '[', suffix + ']');
                                 } else if (typeof data[key] == 'boolean') {

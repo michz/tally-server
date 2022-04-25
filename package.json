@@ -1,6 +1,6 @@
 {
   "name": "tally-server",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "author": {
     "name": "Michael Zapf",
     "email": "m.zapf@mztx.de",
@@ -14,6 +14,8 @@
     "aedes": "^0.46.3",
     "atem-connection": "^2.4.0",
     "fomantic-ui-css": "^2.8.8",
+    "i18next": "^21.6.16",
+    "i18next-browser-languagedetector": "^6.1.4",
     "jquery-serializejson": "^3.2.1",
     "m32": "^0.0.9",
     "mqtt": "^4.3.6",
@@ -31,7 +33,9 @@
     "assets": [
       "public/*",
       "node_modules/fomantic-ui-css/**",
-      "node_modules/jquery-serializejson/**"
+      "node_modules/jquery-serializejson/**",
+      "node_modules/i18next/i18next.min.js",
+      "node_modules/i18next-browser-languagedetector/i18nextBrowserLanguageDetector.min.js"
     ],
     "outputPath": "dist"
   }
