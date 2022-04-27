@@ -5,7 +5,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const ansi_up = new AnsiUp.default();
 
     const cwd = '..';
-    const mainBinary = './dist/tally-server-linux';
+    const mainBinary = './tally-server';
 
     let childProcess = null;
 

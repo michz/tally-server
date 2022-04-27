@@ -6,13 +6,14 @@ const createWindow = () => {
   const win = new BrowserWindow({
     width: 800,
     height: 600,
+    icon: path.join(app.getAppPath(), 'assets/icon.png'),
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
     }
   })
 
   win.removeMenu()
-  win.webContents.openDevTools()
+  //win.webContents.openDevTools()
   win.loadFile('index.html')
 }
 
