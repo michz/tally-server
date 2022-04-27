@@ -1,0 +1,50 @@
+html {
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    text-align: center;
+    -webkit-user-select: none;
+    user-select: none;
+    cursor: default;
+    overflow: hidden;
+    color: #fff;
+}
+
+button {
+    margin: 1rem;
+    padding: 0;
+
+    width: 30%;
+    max-width: 12rem;
+    height: 60%;
+}
+
+#controlArea {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 10rem;
+
+    background-color: rgb(53, 53, 53);
+}
+
+#txtLogs {
+    position: absolute;
+    display: block;
+    overflow: scroll;
+
+    top: 10rem;
+    left: 0;
+    right: 0;
+    bottom: 0;
+
+    font-family: monospace;
+    background-color: #000;
+    color: rgb(228, 228, 228);
+    white-space: pre-wrap;
+
+    text-align: left;
+}
