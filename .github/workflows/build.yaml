@@ -15,16 +15,22 @@ jobs:
       - uses: actions/setup-node@v2
         with:
           node-version: '16'
-      - run: yarn install --frozen-lockfile
-      - run: ./node_modules/.bin/pkg .
       - run: |
-          cd native-ui && \
-          sudo apt-get -y install wine64 && \
+          cd cli && \
           yarn install --frozen-lockfile && \
-          cp ../config.yml ./config.yml && \
-          cp ../dist/tally-server-linux ./tally-server && yarn make --platform linux && \
-          cp ../dist/tally-server-macos ./tally-server && yarn make --platform darwin && \
-          cp ../dist/tally-server-win.exe ./tally-server && yarn make --platform win32
+          yarn make
+      - run: |
+          cd ../native && \
+          yarn install --frozen-lockfile && \
+          yarn make
+#      - run: |
+#          cd native-ui && \
+#          sudo apt-get -y install wine64 && \
+#          yarn install --frozen-lockfile && \
+#          cp ../config.yml ./config.yml && \
+#          cp ../dist/tally-server-linux ./tally-server && yarn make --platform linux && \
+#          cp ../dist/tally-server-macos ./tally-server && yarn make --platform darwin && \
+#          cp ../dist/tally-server-win.exe ./tally-server && yarn make --platform win32
 
       - name: Create Release
         id: create_release
@@ -43,9 +49,8 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           files: |
-            ./dist/tally-server-linux
-            ./dist/tally-server-win.exe
-            ./dist/tally-server-macos
-            ./native-ui/out/make/zip/linux/x64/*.zip
-            ./native-ui/out/make/zip/win32/x64/*.zip
-            ./native-ui/out/make/zip/darwin/x64/*.zip
+            ./cli/dist/tally-server-*
+            ./native-ui/out/make/zip/**/*.zip
+#            ./native-ui/out/make/zip/*/x64/*.zip
+#            ./native-ui/out/make/zip/win32/x64/*.zip
+#            ./native-ui/out/make/zip/darwin/x64/*.zip

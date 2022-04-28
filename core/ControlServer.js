@@ -5,7 +5,7 @@ const path = require("path")
 const url = require("url")
 const websocket = require("websocket")
 
-const webserverBasedir = __dirname + '/../public';
+const webserverBasedir = __dirname + '/public';
 
 module.exports = class ControlServer {
     constructor(logger, httpPort, websocketPort) {
@@ -20,22 +20,21 @@ module.exports = class ControlServer {
     run() {
         http.createServer((request, response) => {
             let uri = url.parse(request.url).pathname;
-            if (uri.startsWith('/node_modules/')) {
-                uri = '/..' + uri;
-            }
+            //if (uri.startsWith('/node_modules/')) {
+            //    uri = '/..' + uri;
+            //}
 
-            let filename = path.join(webserverBasedir, uri);
-
-            fs.exists(filename, function(exists) {
-                if (!exists) {
-                    response.writeHead(404, {"Content-Type": "text/plain"});
-                    response.write("404 Not Found\n");
-                    response.end();
-                    return;
+            const tryServeFile = (filename) => {
+                try {
+                    if (fs.statSync(filename).isDirectory()) {
+                        filename = path.join(filename, 'index.html');
+                    }
+                } catch (e) {
+                   // Not beautiful, but we have to catch some `pkg` behaviour here...
                 }
 
-                if (fs.statSync(filename).isDirectory()) {
-                    filename += '/index.html';
+                if (!fs.existsSync(filename)) {
+                    return false;
                 }
 
                 fs.readFile(filename, "binary", function(err, file) {
@@ -50,7 +49,30 @@ module.exports = class ControlServer {
                     response.write(file, "binary");
                     response.end();
                 });
-            });
+
+                return true;
+            }
+
+            const tryPrefixes = [
+                '',
+                '..',
+                '../..',
+                '../../..',
+            ]
+
+            for (const prefix of tryPrefixes) {
+                let filename = path.join(webserverBasedir, prefix, uri);
+                if (tryServeFile(filename)) {
+                    // Success!
+                    return;
+                }
+            }
+
+            // No file could be served up to now, so abort.
+            response.writeHead(404, {"Content-Type": "text/plain"});
+            response.write("404 Not Found\n");
+            response.end();
+            return;
 
         }).listen(this.httpPort);
         this.logger.info(`Webserver running at http://127.0.0.1:${this.httpPort}`)

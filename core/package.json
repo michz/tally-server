@@ -1,0 +1,26 @@
+{
+  "name": "tally-server-core",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "author": {
+    "name": "Michael Zapf",
+    "email": "m.zapf@mztx.de",
+    "url": "https://mztx.de/"
+  },
+  "dependencies": {
+    "aedes": "^0.46.3",
+    "atem-connection": "^2.4.0",
+    "fomantic-ui-css": "^2.8.8",
+    "i18next": "^21.6.16",
+    "i18next-browser-languagedetector": "^6.1.4",
+    "jquery": "^3.6.0",
+    "jquery-serializejson": "^3.2.1",
+    "m32": "^0.0.9",
+    "mqtt": "^4.3.6",
+    "multicast-dns": "^7.2.4",
+    "websocket": "^1.0.34",
+    "winston": "^3.6.0",
+    "yaml": "^2.0.1"
+  }
+}
