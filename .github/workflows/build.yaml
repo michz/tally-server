@@ -20,7 +20,7 @@ jobs:
           yarn install --frozen-lockfile && \
           yarn make
       - run: |
-          cd ../native && \
+          cd native-ui && \
           yarn install --frozen-lockfile && \
           yarn make
 #      - run: |

@@ -21,9 +21,19 @@
             "name": "Tally Server UI"
           },
           "platforms": [
-            "darwin",
             "linux",
             "win32"
+          ]
+        },
+        {
+          "name": "@electron-forge/maker-dmg",
+          "config": {
+            "name": "Tally Server UI",
+            "background": "./assets/dmg-background.png",
+            "format": "ULFO"
+          },
+          "platforms": [
+            "darwin"
           ]
         }
       ]
@@ -31,9 +41,7 @@
   },
   "devDependencies": {
     "@electron-forge/cli": "^6.0.0-beta.63",
-    "@electron-forge/maker-deb": "^6.0.0-beta.63",
-    "@electron-forge/maker-rpm": "^6.0.0-beta.63",
-    "@electron-forge/maker-squirrel": "^6.0.0-beta.63",
+    "@electron-forge/maker-dmg": "^6.0.0-beta.63",
     "@electron-forge/maker-zip": "^6.0.0-beta.63",
     "electron": "^18.1.0"
   },
