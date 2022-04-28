@@ -18,7 +18,7 @@ const createWindow = () => {
   })
 
   win.removeMenu()
-  win.webContents.openDevTools()
+  //win.webContents.openDevTools()
   win.loadURL(urls[0])
   //win.loadFile('index.html')
 }

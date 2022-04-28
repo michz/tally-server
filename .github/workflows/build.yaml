@@ -8,7 +8,7 @@ on:
       - v*
 
 jobs:
-  release:
+  build-cli:
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v2
@@ -19,18 +19,55 @@ jobs:
           cd cli && \
           yarn install --frozen-lockfile && \
           yarn make
+      - uses: actions/upload-artifact@v3
+        with:
+          name: cli-linux
+          path: ./cli/dist/tally-server-*
+
+  build-ui-linux-win:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '16'
+      - run: sudo apt-get -y install wine64
       - run: |
           cd native-ui && \
           yarn install --frozen-lockfile && \
-          yarn make
-#      - run: |
-#          cd native-ui && \
-#          sudo apt-get -y install wine64 && \
-#          yarn install --frozen-lockfile && \
-#          cp ../config.yml ./config.yml && \
-#          cp ../dist/tally-server-linux ./tally-server && yarn make --platform linux && \
-#          cp ../dist/tally-server-macos ./tally-server && yarn make --platform darwin && \
-#          cp ../dist/tally-server-win.exe ./tally-server && yarn make --platform win32
+          yarn make-linux && \
+          yarn make-win32
+      - uses: actions/upload-artifact@v3
+        with:
+          name: ui-linux-win
+          path: ./native-ui/out/make/**
+
+  build-ui-macos:
+    runs-on: macos-11
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '16'
+      - run: |
+          cd native-ui && \
+          yarn install --frozen-lockfile && \
+          yarn make-darwin
+      - uses: actions/upload-artifact@v3
+        with:
+          name: ui-macos
+          path: ./native-ui/out/make/**
+
+  release:
+    needs:
+      - build-cli
+      - build-ui-linux-win
+      - build-ui-macos
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/download-artifact@v3
+        with:
+          path: artifacts
 
       - name: Create Release
         id: create_release
@@ -48,9 +85,4 @@ jobs:
         id: upload-release-assets
         uses: softprops/action-gh-release@v1
         with:
-          files: |
-            ./cli/dist/tally-server-*
-            ./native-ui/out/make/zip/**/*.zip
-#            ./native-ui/out/make/zip/*/x64/*.zip
-#            ./native-ui/out/make/zip/win32/x64/*.zip
-#            ./native-ui/out/make/zip/darwin/x64/*.zip
+          files: artifacts/**

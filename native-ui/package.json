@@ -4,10 +4,13 @@
   "main": "index.js",
   "author": "Michael Zapf",
   "license": "MIT",
+  "description": "Tally Server UI",
   "scripts": {
     "start": "electron-forge start",
     "package": "electron-forge package",
-    "make": "electron-forge make"
+    "make-linux": "electron-forge make --platform linux",
+    "make-darwin": "electron-forge make --platform darwin",
+    "make-win32": "electron-forge make --platform win32"
   },
   "config": {
     "forge": {
@@ -18,7 +21,7 @@
         {
           "name": "@electron-forge/maker-zip",
           "config": {
-            "name": "Tally Server UI"
+            "name": "Tally-Server-UI"
           },
           "platforms": [
             "linux",
@@ -28,8 +31,7 @@
         {
           "name": "@electron-forge/maker-dmg",
           "config": {
-            "name": "Tally Server UI",
-            "background": "./assets/dmg-background.png",
+            "name": "Tally-Server-UI-MacOS",
             "format": "ULFO"
           },
           "platforms": [
@@ -42,6 +44,7 @@
   "devDependencies": {
     "@electron-forge/cli": "^6.0.0-beta.63",
     "@electron-forge/maker-dmg": "^6.0.0-beta.63",
+    "@electron-forge/maker-squirrel": "^6.0.0-beta.63",
     "@electron-forge/maker-zip": "^6.0.0-beta.63",
     "electron": "^18.1.0"
   },
