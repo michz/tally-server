@@ -1,0 +1,39 @@
+{
+  "name": "tally-server-cli",
+  "version": "1.0.0",
+  "author": {
+    "name": "Michael Zapf",
+    "email": "m.zapf@mztx.de",
+    "url": "https://mztx.de/"
+  },
+  "homepage": "https://github.com/michz/tally-server",
+  "license": "MIT",
+  "main": "./index.js",
+  "bin": "./index.js",
+  "scripts": {
+    "start": "node ./index.js",
+    "make": "./node_modules/.bin/pkg ."
+  },
+  "dependencies": {
+    "open": "^8.4.0",
+    "tally-server-core": "file:../core"
+  },
+  "devDependencies": {
+    "pkg": "^5.6.0"
+  },
+  "pkg": {
+    "scripts": "cli/*.js",
+    "assets": [
+      "node_modules/tally-server-core/public/*",
+      "node_modules/fomantic-ui-css/**",
+      "node_modules/jquery/LICENSE*",
+      "node_modules/jquery/dist/jquery*",
+      "node_modules/jquery-serializejson/**",
+      "node_modules/i18next/i18next.min.js",
+      "node_modules/i18next/LICENSE",
+      "node_modules/i18next-browser-languagedetector/i18nextBrowserLanguageDetector.min.js",
+      "node_modules/i18next-browser-languagedetector/LICENSE"
+    ],
+    "outputPath": "dist"
+  }
+}

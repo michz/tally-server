@@ -168,6 +168,17 @@
                 min-height: 60vh;
             }
 
+            #versions {
+                float: right;
+                font-size: 0.8em;
+                color: #bbb;
+                padding: 0.5em 1em 0 0;
+            }
+
+            .ui.button.remoteControl {
+                float: right;
+            }
+
             .ui.button.applicationSettings {
                 float: right;
             }
@@ -180,6 +191,8 @@
         </div>
 
         <div class="ui icon button black applicationSettings" data-translate-title title="button.settings"><i class="icon cog"></i></div>
+        <div class="ui icon button black remoteControl" data-translate-title title="button.remote"><i class="icon qrcode"></i></div>
+        <span id="versions"></span>
 
         <h1 data-translatable>header.main</h1>
 
@@ -292,9 +305,25 @@
             </div>
         </form>
 
+        <div class="ui modal remoteControl">
+            <i class="close icon"></i>
+            <div class="header" data-translatable>
+                header.remote
+            </div>
+            <div class="content">
+                <div class="ui remote-urls">
+
+                </div>
+            </div>
+            <div class="actions">
+                <div class="ui deny button" data-translatable>
+                    button.close
+                </div>
+            </div>
+        </div>
 
 
-        <script src="jquery-3.6.0.min.js"></script>
+        <script src="node_modules/jquery/dist/jquery.min.js"></script>
         <script src="node_modules/jquery-serializejson/jquery.serializejson.min.js"></script>
         <script src="node_modules/i18next/i18next.min.js"></script>
         <script src="node_modules/i18next-browser-languagedetector/i18nextBrowserLanguageDetector.min.js"></script>
@@ -312,14 +341,16 @@
                     order: ['querystring', 'cookie', 'localStorage', 'sessionStorage', 'navigator', 'htmlTag'],
                     caches: null,
                 },
-                debug: true,
+                debug: false,
                 resources: {
                     en: {
                         translation: {
                             button: {
                                 cancel: 'Cancel',
+                                close: 'Close',
                                 save: 'Save',
                                 settings: 'Settings',
+                                remote: 'Remote Control',
                             },
                             field: {
                                 channel: 'Channel',
@@ -333,6 +364,7 @@
                                 settings: 'Settings',
                                 tally_config: 'Tally Configuration',
                                 tally_intercom_config: 'X32 Intercom/Talkback Microphone Channel',
+                                remote: 'Remote Control',
                             },
                             info: {
                                 leave_empty_to_reset_intercom: 'Leave empty to remove the intercom configuration from this Tally.',
@@ -352,8 +384,10 @@
                         translation: {
                             button: {
                                 cancel: 'Abbrechen',
+                                close: 'Schließen',
                                 save: 'Speichern',
                                 settings: 'Einstellungen',
+                                remote: 'Fernzugriff',
                             },
                             field: {
                                 channel: 'Kanal',
@@ -367,6 +401,7 @@
                                 settings: 'Einstellungen',
                                 tally_config: 'Tally-Einstellungen',
                                 tally_intercom_config: 'X32 Intercom/Talkback Mikrofonkanal',
+                                remote: 'Fernsteuerung',
                             },
                             info: {
                                 leave_empty_to_reset_intercom: 'Leer lassen, um die Intercom-Konfiguration von diesem Tally zu entfernen.',
@@ -496,6 +531,12 @@
                         }
 
                         fillSettingsForm(msg.data, '', '');
+                    } else if (msg.type === "remoteUrls") {
+                        const $div = $('.remote-urls');
+                        $div.html();
+                        for (url of msg.data.urls) {
+                            $div.append('<p><a href=' + url + ' target="_blank">' + url + '</a></p>')
+                        }
                     } else if (msg.type === "log") {
                         var $log = $("#log");
                         $log.append(msg.data.msg + "<br>");
@@ -558,6 +599,15 @@
                                 }));
                             }
                         })
+                        .modal('show')
+                    ;
+                });
+
+                $('.button.remoteControl').on('click', function () {
+                    ws.send(JSON.stringify({
+                        type: 'getRemoteUrls',
+                    }));
+                    $('.ui.modal.remoteControl')
                         .modal('show')
                     ;
                 });

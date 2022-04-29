@@ -37,6 +37,20 @@ Simply execute the exe file.
 * Confirm all warnings about unverified source/developer
 
 
+## Development
+
+For easier module development, start with:
+
+```
+rm -rf core/node_modules cli/node_modules native-ui/node_modules
+cd core
+yarn link
+cd ../cli
+yarn link tally-server-core
+cd ../native-ui
+yarn link tally-server-core
+```
+
 ## Node
 
 Node Version: see `.nvmrc`

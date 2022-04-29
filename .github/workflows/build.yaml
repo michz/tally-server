@@ -8,15 +8,66 @@ on:
       - v*
 
 jobs:
-  release:
+  build-cli:
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v2
         with:
           node-version: '16'
-      - run: yarn install --frozen-lockfile
-      - run: ./node_modules/.bin/pkg .
+      - run: |
+          cd cli && \
+          yarn install --frozen-lockfile && \
+          yarn make
+      - uses: actions/upload-artifact@v3
+        with:
+          name: cli-linux
+          path: ./cli/dist/tally-server-*
+
+  build-ui-linux-win:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '16'
+      - run: sudo apt-get -y install wine64
+      - run: |
+          cd native-ui && \
+          yarn install --frozen-lockfile && \
+          yarn make-linux && \
+          yarn make-win32
+      - uses: actions/upload-artifact@v3
+        with:
+          name: ui-linux-win
+          path: ./native-ui/out/make/**
+
+  build-ui-macos:
+    runs-on: macos-11
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '16'
+      - run: |
+          cd native-ui && \
+          yarn install --frozen-lockfile && \
+          yarn make-darwin
+      - uses: actions/upload-artifact@v3
+        with:
+          name: ui-macos
+          path: ./native-ui/out/make/**
+
+  release:
+    needs:
+      - build-cli
+      - build-ui-linux-win
+      - build-ui-macos
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/download-artifact@v3
+        with:
+          path: artifacts
 
       - name: Create Release
         id: create_release
@@ -30,35 +81,8 @@ jobs:
           draft: false
           prerelease: false
 
-      - name: Upload Release Asset (Linux)
-        id: upload-release-asset-linux
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Upload Release Assets
+        id: upload-release-assets
+        uses: softprops/action-gh-release@v1
         with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./dist/tally-server-linux
-          asset_name: tally-server-linux
-          asset_content_type: application/octet-stream
-
-      - name: Upload Release Asset (Windows)
-        id: upload-release-asset-windows
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./dist/tally-server-win.exe
-          asset_name: tally-server-win.exe
-          asset_content_type: application/octet-stream
-
-      - name: Upload Release Asset (MacOS)
-        id: upload-release-asset-macos
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./dist/tally-server-macos
-          asset_name: tally-server-macos
-          asset_content_type: application/octet-stream
+          files: artifacts/**
