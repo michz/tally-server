@@ -26,9 +26,13 @@
     "assets": [
       "node_modules/tally-server-core/public/*",
       "node_modules/fomantic-ui-css/**",
+      "node_modules/jquery/LICENSE*",
+      "node_modules/jquery/dist/jquery*",
       "node_modules/jquery-serializejson/**",
       "node_modules/i18next/i18next.min.js",
-      "node_modules/i18next-browser-languagedetector/i18nextBrowserLanguageDetector.min.js"
+      "node_modules/i18next/LICENSE",
+      "node_modules/i18next-browser-languagedetector/i18nextBrowserLanguageDetector.min.js",
+      "node_modules/i18next-browser-languagedetector/LICENSE"
     ],
     "outputPath": "dist"
   }

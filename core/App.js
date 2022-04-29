@@ -15,15 +15,16 @@ const Log = require("./Log")
 const LogToCallbackTransport = require('./LogToCallbackTransport')
 const ObjectMerger = require('./ObjectMerger')
 
-const configFilePath = './config.yml'
+let defaultConfigFileName = 'tally-server-config.yml'
 
 module.exports = class App {
-    constructor() {
+    constructor(configFilePath) {
         this.logToCallbackTransport = new LogToCallbackTransport();
         const log = new Log(this.logToCallbackTransport)
 
         this.logger = log.getLogger()
         this.config = {}
+        this.configFilePath = undefined
     }
 
     getLogger() {
@@ -62,6 +63,59 @@ module.exports = class App {
         open(urls[0])
     }
 
+    findConfigurationFile() {
+        const tryPath = (pathToTry) => {
+            let tryFilePath = path.join(pathToTry, defaultConfigFileName)
+            // Check if file exists and is RW
+            if (fs.existsSync(tryFilePath)) {
+                try {
+                    fs.accessSync(tryFilePath, fs.constants.R_OK | fs.constants.W_OK)
+                    return tryFilePath
+                } catch (e) {
+                    // Did not work, so try next
+                }
+            }
+
+            // Check if directory exists and is RW (so file can be created)
+            if (fs.existsSync(pathToTry)) {
+                try {
+                    fs.accessSync(pathToTry, fs.constants.R_OK | fs.constants.W_OK)
+                    return pathToTry
+                } catch (e) {
+                    // Did not work, so try next
+                }
+            }
+
+            return false
+        }
+
+        let pathsToTry = [
+            './',
+            // @TODO Add more somewhen in the future, if necessary
+        ]
+
+        if (process.platform === 'darwin') {
+            pathsToTry.push(path.join(os.homedir(), 'Library/Preferences'))
+        }
+
+        if (process.platform === 'win32' || process.platform === 'win64') {
+            pathsToTry.push(path.join(os.homedir(), 'AppData/Roaming'))
+        }
+
+        for (const pathToTry of pathsToTry) {
+            const r = tryPath(pathToTry)
+            if (r) {
+                if (fs.lstatSync(r).isDirectory()) {
+                    return path.join(r, defaultConfigFileName)
+                }
+
+                return r
+            }
+        }
+
+        throw Error('Could not find a writable configuration location.')
+    }
+
     readConfiguration(path) {
         const configFileContents = fs.readFileSync(path, 'utf8')
         const config = YAML.parse(configFileContents)
@@ -74,8 +128,16 @@ module.exports = class App {
 
 
     run() {
+        // Find config file to use
+        if (!this.configFilePath) {
+            this.configFilePath = this.findConfigurationFile()
+            if (!fs.existsSync(this.configFilePath)) {
+                fs.cpSync(path.join(__dirname, 'config.yml'), this.configFilePath)
+            }
+        }
+
         // Save configuration method
-        this.config = this.readConfiguration(configFilePath)
+        this.config = this.readConfiguration(this.configFilePath)
         this.logger.info('Config: ' + JSON.stringify(this.config, null, 2));
 
         // mDNS Client/Server
@@ -275,7 +337,7 @@ module.exports = class App {
                 }
 
                 // Backup config
-                this.saveConfiguration(this.config, configFilePath + '.bak')
+                this.saveConfiguration(this.config, this.configFilePath + '.bak')
 
                 if (intercomChannel) {
                     this.config['x32']['tally_mapping'][tally] = intercomChannel
@@ -284,7 +346,7 @@ module.exports = class App {
                 }
 
                 // Save changed config
-                this.saveConfiguration(this.config, configFilePath)
+                this.saveConfiguration(this.config, this.configFilePath)
 
                 // Send change to websocket clients
                 controlServer.sendToWebsocketClients({
@@ -296,13 +358,13 @@ module.exports = class App {
                 })
             } else if (message.type === 'changeSettings') {
                 // Backup config
-                this.saveConfiguration(this.config, configFilePath + '.bak')
+                this.saveConfiguration(this.config, this.configFilePath + '.bak')
 
                 // Merge existing config and new config
                 ObjectMerger(this.config, message.data)
 
                 // Save changed config
-                this.saveConfiguration(this.config, configFilePath)
+                this.saveConfiguration(this.config, this.configFilePath)
 
                 // Inform clients about new config
                 sendSettingsToWebsocketClients();
