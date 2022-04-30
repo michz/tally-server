@@ -1,6 +1,6 @@
 {
   "name": "tally-server-ui",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "main": "index.js",
   "author": "Michael Zapf",
   "license": "MIT",
@@ -51,7 +51,7 @@
   "dependencies": {
     "ansi_up": "^5.1.0",
     "electron-squirrel-startup": "^1.0.0",
-    "tree-kill": "^1.2.2",
-    "tally-server-core": "file:../core"
+    "tally-server-core": "file:../core",
+    "tree-kill": "^1.2.2"
   }
 }

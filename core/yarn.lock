@@ -580,7 +580,7 @@ jquery-serializejson@^3.2.1:
   resolved "https://registry.yarnpkg.com/jquery-serializejson/-/jquery-serializejson-3.2.1.tgz#2d1b701695bf192f6e92cdf6b22db5a3177ea045"
   integrity sha512-89UxVNC4ac9XC5tWPz3DjSTYFcT5z6JYsxGVw+qHhD61FzjbEzXJHjpdLnezWujjqtIECi/URQ6KdPmDE9imGA==
 
-jquery@^3.4.0:
+jquery@^3.4.0, jquery@^3.6.0:
   version "3.6.0"
   resolved "https://registry.yarnpkg.com/jquery/-/jquery-3.6.0.tgz#c72a09f15c1bdce142f49dbf1170bdf8adac2470"
   integrity sha512-JVzAR/AjBvVt2BmYhxRCSYysDsPcssdmTFnzyLEts9qNwmjmu4JTAMYubEfwVOSwpQ1I1sKKFcxhZCI2buerfw==
