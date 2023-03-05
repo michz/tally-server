@@ -1,10 +1,6 @@
 dist/
 node_modules/
 
-tally-server-linux
-tally-server-macos
-tally-server-win.exe
-
 tally-server.log
 
 yarn-error.log

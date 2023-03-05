@@ -1,6 +1,6 @@
 {
   "name": "tally-server-core",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "main": "index.js",
   "license": "MIT",
   "author": {
@@ -9,18 +9,18 @@
     "url": "https://mztx.de/"
   },
   "dependencies": {
-    "aedes": "^0.46.3",
-    "atem-connection": "^2.4.0",
-    "fomantic-ui-css": "^2.8.8",
-    "i18next": "^21.6.16",
-    "i18next-browser-languagedetector": "^6.1.4",
-    "jquery": "^3.6.0",
+    "aedes": "^0.49",
+    "atem-connection": "^3.2.0",
+    "fomantic-ui-css": "^2.9.2",
+    "i18next": "^22.4",
+    "i18next-browser-languagedetector": "^7.0.1",
+    "jquery": "^3.6.3",
     "jquery-serializejson": "^3.2.1",
     "m32": "^0.0.9",
     "mqtt": "^4.3.6",
-    "multicast-dns": "^7.2.4",
+    "multicast-dns": "^7.2.5",
     "websocket": "^1.0.34",
-    "winston": "^3.6.0",
-    "yaml": "^2.0.1"
+    "winston": "^3.8.2",
+    "yaml": "^2.2.1"
   }
 }
