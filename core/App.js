@@ -275,44 +275,46 @@ module.exports = class App {
         // Additional Wiring
         // On initial connection, send current state to client
         controlServer.setWebsocketClientConnectedCallback((connection) => {
-            for (const message of mqttBroker.getBroker().persistence._retained) {
-                const reOnline = /tally\/(\d+)\/online/
-                let matches = message["topic"].match(reOnline)
-                if (matches !== null && matches.length > 0) {
-                    const payload = message.payload.toString('utf-8')
-                    controlServer.sendToWebsocketClients({
-                        type: 'online',
-                        data: {
-                            channel: matches[1],
-                            state: (payload === "0") ? "offline" : "online",
-                        },
-                    })
-                }
+            if (mqttBroker.getBroker().persistence._retained !== undefined) {
+                for (const message of mqttBroker.getBroker().persistence._retained) {
+                    const reOnline = /tally\/(\d+)\/online/
+                    let matches = message["topic"].match(reOnline)
+                    if (matches !== null && matches.length > 0) {
+                        const payload = message.payload.toString('utf-8')
+                        controlServer.sendToWebsocketClients({
+                            type: 'online',
+                            data: {
+                                channel: matches[1],
+                                state: (payload === "0") ? "offline" : "online",
+                            },
+                        })
+                    }
 
-                const reState = /tally\/(\d+)\/state/
-                matches = message["topic"].match(reState)
-                if (matches !== null && matches.length > 0) {
-                    const payload = message.payload.toString('utf-8')
-                    controlServer.sendToWebsocketClients({
-                        type: 'channel',
-                        data: {
-                            channel: matches[1],
-                            state: payload,
-                        },
-                    })
-                }
+                    const reState = /tally\/(\d+)\/state/
+                    matches = message["topic"].match(reState)
+                    if (matches !== null && matches.length > 0) {
+                        const payload = message.payload.toString('utf-8')
+                        controlServer.sendToWebsocketClients({
+                            type: 'channel',
+                            data: {
+                                channel: matches[1],
+                                state: payload,
+                            },
+                        })
+                    }
 
-                const reHostname = /tally\/(\d+)\/hostname/
-                matches = message["topic"].match(reHostname)
-                if (matches !== null && matches.length > 0) {
-                    const payload = message.payload.toString('utf-8')
-                    controlServer.sendToWebsocketClients({
-                        type: 'tallyHostname',
-                        data: {
-                            channel: matches[1],
-                            hostname: payload,
-                        },
-                    })
+                    const reHostname = /tally\/(\d+)\/hostname/
+                    matches = message["topic"].match(reHostname)
+                    if (matches !== null && matches.length > 0) {
+                        const payload = message.payload.toString('utf-8')
+                        controlServer.sendToWebsocketClients({
+                            type: 'tallyHostname',
+                            data: {
+                                channel: matches[1],
+                                hostname: payload,
+                            },
+                        })
+                    }
                 }
             }
 
